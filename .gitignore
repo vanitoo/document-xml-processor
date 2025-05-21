@@ -1,0 +1,110 @@
+#################################
+# .NET и C# общие исключения
+#################################
+
+bin/
+obj/
+TestResults/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.log
+*.tmp
+
+#################################
+# Visual Studio
+#################################
+
+.vs/
+.vscode/
+*.dbmdl
+*.psess
+*.vsp
+*.pdb
+*.cache
+*.bak
+*.Backup
+*.orig
+*.sdf
+*.ipch
+*.opensdf
+*.sln.ide
+
+#################################
+# Rider / JetBrains
+#################################
+
+.idea/
+*.sln.iml
+
+#################################
+# NuGet
+#################################
+
+*.nupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+
+#################################
+# Docker
+#################################
+
+**/Dockerfile.*
+docker-compose.*
+*.tar
+*.tgz
+.dockerignore
+
+#################################
+# OS специфичное
+#################################
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.stackdump
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.*.swp
+.*.swo
+
+#################################
+# Logs и кэш
+#################################
+
+*.log
+*.tlog
+*.cache/
+*.csproj.user
+*.dotCover
+*.coverage
+*.coveragexml
+
+#################################
+# Папки IDE и tooling
+#################################
+
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+#################################
+# Секреты (если вдруг)
+#################################
+
+secrets.json
+appsettings.Development.json
+.env
+.env.*
+

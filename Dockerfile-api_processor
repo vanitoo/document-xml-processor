@@ -1,0 +1,19 @@
+﻿FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /source
+
+COPY ./DocumentXmlProcessorContext ./DocumentXmlProcessorContext/
+COPY ./ProcessingCommon ./ProcessingCommon/
+COPY ./DocumentXmlProcessorAPI ./DocumentXmlProcessorAPI/
+RUN dotnet restore DocumentXmlProcessorContext/DocumentXmlProcessorContext.csproj
+RUN dotnet restore ProcessingCommon/ProcessingCommon.csproj
+RUN dotnet restore DocumentXmlProcessorAPI/DocumentXmlProcessorAPI.csproj
+
+WORKDIR /source/DocumentXmlProcessorAPI
+RUN dotnet build DocumentXmlProcessorAPI.csproj -c Release -o /app
+RUN dotnet publish DocumentXmlProcessorAPI.csproj -c Release -o /app
+
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
+WORKDIR /app
+COPY --from=build /app ./
+COPY ./DocumentXmlProcessorAPI/appsettings.json ./
+ENTRYPOINT ["dotnet", "DocumentXmlProcessorAPI.dll"]

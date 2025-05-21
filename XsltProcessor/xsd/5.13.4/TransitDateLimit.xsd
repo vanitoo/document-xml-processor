@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:cat_ru="urn:customs.ru:CommonAggregateTypes:5.10.0" xmlns:clt_ru="urn:customs.ru:CommonLeafTypes:5.10.0" xmlns:tdl="urn:customs.ru:Information:CustomsDocuments:TransitDateLimit:5.12.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:customs.ru:Information:CustomsDocuments:TransitDateLimit:5.12.0" elementFormDefault="qualified" version="5.12.0.0">
+	<xs:import namespace="urn:customs.ru:CommonLeafTypes:5.10.0" schemaLocation="CommonLeafTypesCust.xsd"/>
+	<xs:import namespace="urn:customs.ru:CommonAggregateTypes:5.10.0" schemaLocation="CommonAggregateTypesCust.xsd"/>
+	<xs:annotation>
+		<xs:documentation>Заявление/уведомление о продлении срока таможенного транзита</xs:documentation>
+	</xs:annotation>
+	<xs:element name="TransitDateLimit" type="tdl:TransitDateLimitType"/>
+	<xs:complexType name="TransitDateLimitType">
+		<xs:annotation>
+			<xs:documentation>Заявление/уведомление о продлении срока таможенного транзита</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cat_ru:BaseDocType">
+				<xs:sequence>
+					<xs:element name="DocumentSign" type="clt_ru:Numeric1Type">
+						<xs:annotation>
+							<xs:documentation>Признак документа о продлении срока таможенного транзита: 0 - заявление; 1 - уведомление</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DocDate" type="clt_ru:DateCustType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Дата направления документа</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DocTime" type="clt_ru:TimeCustType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Время направления документа</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:choice>
+						<xs:element name="DateLimit" type="clt_ru:DateCustType">
+							<xs:annotation>
+								<xs:documentation>Срок продления таможенного транзита</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="CanselReason" type="clt_ru:FreeText250Type">
+							<xs:annotation>
+								<xs:documentation>Причины отказа в продлении срока</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+					<xs:element name="Reason" type="clt_ru:FreeText250Type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Причины изменения срока таможенного транзита</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:choice>
+						<xs:element name="TD" type="cat_ru:GTDIDType">
+							<xs:annotation>
+								<xs:documentation>Номер транзитной декларации</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="TIRID" type="tdl:TIRIDType">
+							<xs:annotation>
+								<xs:documentation>Номер книжки МДП</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+					<xs:element name="CustomsPerson" type="cat_ru:CustomsPersonType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Должностное лицо таможенного органа</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="UIN" type="cat_ru:GTDIDType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>УИН описи</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="DocumentModeID" type="clt_ru:DocumentModeIDType" use="required" fixed="1006173E">
+					<xs:annotation>
+						<xs:documentation>Идентификатор вида документа</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>Локальные прикладные типы</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="TIRIDType">
+		<xs:annotation>
+			<xs:documentation>Номер книжки МДП</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="TIRID" type="clt_ru:Code8Type">
+				<xs:annotation>
+					<xs:documentation>Номер книжки МДП.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TIRSeries" type="clt_ru:Code2Type">
+				<xs:annotation>
+					<xs:documentation>Серия книжки МДП.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TIRPageNumber" type="clt_ru:Count5Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Номер листа книжки МДП.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,925 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:clt_ru="urn:customs.ru:CommonLeafTypes:5.10.0" xmlns:cat_ru="urn:customs.ru:CommonAggregateTypes:5.10.0" xmlns:RUScat_ru="urn:customs.ru:RUSCommonAggregateTypes:5.13.3" xmlns:cltTrans_ru="urn:customs.ru:Information:TransportDocuments:TransportCommonLeafTypesCust:5.12.0" xmlns:cltpi_ru="urn:customs.ru:Information:PriorInformation:PriorCommonLeafTypes:5.0.5" xmlns:catpi_ru="urn:customs.ru:Information:PriorInformation:PriorCommonAggregateTypes:5.13.4" targetNamespace="urn:customs.ru:Information:PriorInformation:PriorCommonAggregateTypes:5.13.4" elementFormDefault="qualified" version="5.13.4.0">
+	<xs:import namespace="urn:customs.ru:CommonLeafTypes:5.10.0" schemaLocation="CommonLeafTypesCust.xsd"/>
+	<xs:import namespace="urn:customs.ru:CommonAggregateTypes:5.10.0" schemaLocation="CommonAggregateTypesCust.xsd"/>
+	<xs:import namespace="urn:customs.ru:RUSCommonAggregateTypes:5.13.3" schemaLocation="RUSCommonAggregateTypes.xsd"/>
+	<xs:import namespace="urn:customs.ru:Information:TransportDocuments:TransportCommonLeafTypesCust:5.12.0" schemaLocation="TransportCommonLeafTypesCust.xsd"/>
+	<xs:import namespace="urn:customs.ru:Information:PriorInformation:PriorCommonLeafTypes:5.0.5" schemaLocation="PriorCommonLeafTypesCust.xsd"/>
+	<xs:annotation>
+		<xs:documentation>Общие типы для документов предварительного информирования</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="AddressType">
+		<xs:annotation>
+			<xs:documentation>Адрес </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="PostalCode" type="clt_ru:PostalCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Почтовый индекс.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CountryCode" type="clt_ru:CountryA2CodeType">
+				<xs:annotation>
+					<xs:documentation>Буквенный код страны.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CounryName" type="clt_ru:CountryNameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Краткое наименование страны.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Region" type="clt_ru:RegionType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Область (регион, штат, провинция и т.п.)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="City" type="clt_ru:CityNameType">
+				<xs:annotation>
+					<xs:documentation>Населенный пункт.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StreetHouse" type="clt_ru:StreetHouseType">
+				<xs:annotation>
+					<xs:documentation>Улица, номер дома, номер офиса.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CountryInformationType">
+		<xs:annotation>
+			<xs:documentation>Сведения о стране</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="CountryName" type="clt_ru:CountryNameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование страны</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CountryACode" type="clt_ru:CountryA2CodeType">
+				<xs:annotation>
+					<xs:documentation>Буквенный код страны</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CountryPlace" type="clt_ru:NameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Место отгрузки / место назначения</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DestinationWarehouseType">
+		<xs:annotation>
+			<xs:documentation>СВХ места назначения</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="CertificateNumber" type="clt_ru:DocumentNumberType">
+				<xs:annotation>
+					<xs:documentation>Номер Свидетельства о включении в Реестр / Номер лицензии </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CertificateDate" type="clt_ru:DateCustType">
+				<xs:annotation>
+					<xs:documentation>Дата выдачи свидетельства о включении в Реестр владельцев СВХ / ТС / Дата выдачи лицензии </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DriverInformationType">
+		<xs:annotation>
+			<xs:documentation>Информация о водителях</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cat_ru:PersonBaseType">
+				<xs:sequence>
+					<xs:element name="IdentityCard" type="cat_ru:IdentityCardType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Документ, удостоверяющий личность водителя</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="GoodsMeasureQuantityType">
+		<xs:annotation>
+			<xs:documentation>Количество товара в дополнительных единицах измерения</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="GoodsQuantity" type="clt_ru:QuantityBasisType">
+				<xs:annotation>
+					<xs:documentation>Количество товара в единице измерения.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MeasureUnitQualifierName" type="clt_ru:MeasureUnitQualifierNameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Краткое наименование единицы измерения.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MeasureUnitQualifierCode" type="clt_ru:MeasureUnitQualifierCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Код единицы измерения в соответствии с единицами измерения, применяемыми в Таможенном тарифе Российской Федерации..</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GoodsPackagingType">
+		<xs:annotation>
+			<xs:documentation>Сведения о грузовых местах, и упаковке товаров</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="PakageQuantity" type="clt_ru:PakageNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Количество грузовых мест.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CargoCode" type="clt_ru:PackageCodeType">
+				<xs:annotation>
+					<xs:documentation>Код вида груза в соответствии с  классификатором видов груза, упаковки и упаковочных материалов.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CargoDescription" type="clt_ru:FreeText250Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Описание вида груза.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Seal" type="cltTrans_ru:SealIDType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Номера пломб</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PackingInformation" type="catpi_ru:PackingInformationType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Сведения об упаковке товаров. Код, Количество. Маркировка</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GoodsType">
+		<xs:annotation>
+			<xs:documentation>Сведения о товарах</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cat_ru:GoodsBaseType">
+				<xs:sequence>
+					<xs:element name="ContainerNumbers" type="clt_ru:ContainerIdentityType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Номера контейнеров</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="OriginCountryCode" type="clt_ru:CountryA2CodeType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Буквенный код страны происхождения товара.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="InvoicedCost" type="clt_ru:AmountType">
+						<xs:annotation>
+							<xs:documentation>Фактурная стоимость</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CurrencyCode" type="clt_ru:CurrencyA3CodeType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Буквенный код валюты</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CurrencyRate" type="clt_ru:CurrencyRateType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Курс валюты</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="GoodsMeasureQuantity" type="catpi_ru:GoodsMeasureQuantityType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Количество товара в дополнительных единицах измерения</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="PresentedDocuments" type="catpi_ru:PresentedDocumentsType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Транспортные и коммерческие документы</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="GoodsPackaging" type="catpi_ru:GoodsPackagingType">
+						<xs:annotation>
+							<xs:documentation>Сведения о грузовых местах, и упаковке товаров</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="GuaranteeDocumentType">
+		<xs:annotation>
+			<xs:documentation>Реквизиты гарантии</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="DocumentNumber" type="clt_ru:DocumentNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Номер документа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GRN" type="clt_ru:DocumentNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Регистрационный номер гарантии (GRN) заполняется в случае использования гарантии NCTS.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IssueDate" type="clt_ru:DateCustType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата документа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="NotValid4EC" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак наличия ограничения для стран ЕС, заполняется в случае использования гарантии NCTS</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="LimitationNonEC" type="catpi_ru:LimitationNonECType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Ограничение действия гарантии вне ЕС</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GuaranteeType">
+		<xs:annotation>
+			<xs:documentation>Гарантия</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MeasureCode" type="clt_ru:Code2Type">
+				<xs:annotation>
+					<xs:documentation>Код меры обеспечения</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GuaranteeDocument" type="catpi_ru:GuaranteeDocumentType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Реквизиты гарантии</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LimitationNonECType">
+		<xs:annotation>
+			<xs:documentation>Ограничение действия гарантии вне ЕС</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="NotValid4Country" type="clt_ru:CountryA2CodeType">
+				<xs:annotation>
+					<xs:documentation>Код страны, в которой действует ограничение.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PI_DestinationPlaceType">
+		<xs:annotation>
+			<xs:documentation>Место назначения товаров: Наименование места/код наименование ЖД станции</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="DestinationRWStationCode" type="clt_ru:RailwayStationCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Код ж/д станции назначения</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DestinationRWStationName" type="clt_ru:PlaceNameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование железнодорожной станции назначения</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DestinantionPlaceName" type="clt_ru:PlaceNameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование места назначения</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PI_GoodsType">
+		<xs:annotation>
+			<xs:documentation>Сведения о товаре</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="catpi_ru:PriorGoodsBaseType">
+				<xs:sequence>
+					<xs:element name="ContainerNumbers" type="clt_ru:ContainerIdentityType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Номера контейнеров</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="OriginCountryCode" type="clt_ru:CountryA2CodeType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Буквенный код страны происхождения товара.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="InvoicedCost" type="clt_ru:AmountType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Фактурная стоимость</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CurrencyCode" type="clt_ru:CurrencyA3CodeType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Буквенный код валюты</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CurrencyRate" type="clt_ru:CurrencyRateType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Курс валюты</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="GoodsMeasureQuantity" type="catpi_ru:GoodsMeasureQuantityType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Количество товара в дополнительных единицах измерения</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="GoodsPackaging" type="catpi_ru:GoodsPackagingType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Сведения о грузовых местах, и упаковке товаров</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ControlNoCustoms" type="catpi_ru:ControlNoCustomsType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Сведения об иных видах контроля</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="PIId" type="clt_ru:DocumentIDType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Идентификатор ПИ товара</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PackingInformationType">
+		<xs:annotation>
+			<xs:documentation>Сведения об упаковке товаров. Код, Количество. Маркировка</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="PackingCode" type="clt_ru:PackageCodeType">
+				<xs:annotation>
+					<xs:documentation>Код вида упаковки товаров в соответствии с  классификатором видов груза, упаковки и упаковочных материалов.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PakingQuantity" type="clt_ru:PackagesQuantityType">
+				<xs:annotation>
+					<xs:documentation>Количество упаковок.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PackingMark" type="clt_ru:FreeText250Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Маркировка грузовых мест</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PresentedDocumentsType">
+		<xs:annotation>
+			<xs:documentation>Документы, подтверждающие заявленные сведения</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cat_ru:DocumentBaseType">
+				<xs:sequence>
+					<xs:element name="PresentedDocumentModeCode" type="clt_ru:CustomsDocumentCodeType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Код вида представляемого документа(заполняется в соответствии с классификатором видов документов, используемых при заявлении сведений в графе 44)</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="OrganizationName" type="clt_ru:NameType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Наименование органа, выдавшего документ. При автомобильных перевозках дополнительно заполняется место составления CMR</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PriorGoodsBaseType">
+		<xs:annotation>
+			<xs:documentation>Базовый тип описания товара документов предварительного информирования</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="GoodsNumeric" type="clt_ru:Count5Type">
+				<xs:annotation>
+					<xs:documentation>Номер товара по порядку</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GoodsTNVEDCode" type="clt_ru:GoodsNomenclatureCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Код товара по ТН ВЭД ЕАЭС</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GoodsDescription" type="clt_ru:FreeText250Type" maxOccurs="4">
+				<xs:annotation>
+					<xs:documentation>Описание товара</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GrossWeightQuantity" type="clt_ru:QuantityBasisType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Вес товара брутто (кг)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="NetWeightQuantity" type="clt_ru:QuantityBasisType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Вес товара нетто (кг)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ReloadingInfoType">
+		<xs:annotation>
+			<xs:documentation>Информация о планируемых перегрузках товаров или иных грузовых операциях в пути</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ReloadCountryCode" type="clt_ru:CountryN3CodeType">
+				<xs:annotation>
+					<xs:documentation>Код страны перегрузки товаров</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ReloadCountryName" type="clt_ru:CountryNameType">
+				<xs:annotation>
+					<xs:documentation>Наименование страны перегрузки товара</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ReloadCustomsCode" type="clt_ru:CustomsCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Код таможенного органа перегрузки товаров</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ReloadCustomsName" type="clt_ru:CustomsOfficeNameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование таможенного органа перегрузки товаров</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ContainerIndicator" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак контейнерных перевозок</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ContainerID" type="clt_ru:TransportMeansIDType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Номер нового контейнера</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ReloadTransportMeans" type="catpi_ru:TransportMeansType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Новое транспортное средство</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TIR_IDType">
+		<xs:annotation>
+			<xs:documentation>Реквизиты книжки МДП</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="TIRID" type="clt_ru:Code8Type">
+				<xs:annotation>
+					<xs:documentation>Номер книжки МДП</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TIRSeries" type="clt_ru:Code2Type">
+				<xs:annotation>
+					<xs:documentation>Серия книжки МДП</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TIRWhitePageNumber" type="clt_ru:Count5Type">
+				<xs:annotation>
+					<xs:documentation>Порядковый номер белого листа книжки МДП</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TIRGreenPageNumber" type="clt_ru:Count5Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Порядковый номер зеленого листа книжки МДП</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TIRHolder" type="cltpi_ru:TIRHolderType">
+				<xs:annotation>
+					<xs:documentation>Идентификационный номер держателя книжки МДП</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TransitRouteType">
+		<xs:annotation>
+			<xs:documentation>Маршрут транзита</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="TransitPointNumber" type="clt_ru:Count2Type">
+				<xs:annotation>
+					<xs:documentation>Порядковый номер точки транзита</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TransitRoutePlace" type="clt_ru:PlaceNameType">
+				<xs:annotation>
+					<xs:documentation>Наименование точки маршрута</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TransportMeansType">
+		<xs:annotation>
+			<xs:documentation>Транспортное средство.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="TransportIdentifier" type="clt_ru:TransportMeansIDType">
+				<xs:annotation>
+					<xs:documentation>Идентификатор (номер) основного транспортного средства / название судна/номер авиарейса, бортовой номер/ номер ж.д. вагона.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TrailerIdentifier" type="clt_ru:TransportMeansIDType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Идентификатор (номер) прицепного транспортного средства.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SecondTrailerIdentifier" type="clt_ru:TransportMeansIDType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Идентификатор (номер) второго прицепного транспортного средства</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="VINID" type="clt_ru:VINIDType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Идентификационный номер транспортного средства (VIN)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TransportModeCode" type="clt_ru:TransportModeCodeType">
+				<xs:annotation>
+					<xs:documentation>Код вида транспортного средства по классификатору видов транспорта и транспортировки товаров.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TransportMeansNationalityCode" type="clt_ru:CountryA2CodeType">
+				<xs:annotation>
+					<xs:documentation>Буквенный код страны принадлежности транспортного средства по общероссийскому классификатору стран мира..</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CountryPortInfoType">
+		<xs:annotation>
+			<xs:documentation>Сведения о стране и порте</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="CountryCode" type="clt_ru:CountryA2CodeType">
+				<xs:annotation>
+					<xs:documentation>Код страны</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PortName" type="clt_ru:NameType">
+				<xs:annotation>
+					<xs:documentation>Название порта</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DocPermitType">
+		<xs:annotation>
+			<xs:documentation>Разрешительный документ</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cat_ru:DocumentBaseType">
+				<xs:sequence>
+					<xs:element name="PresentedDocumentModeCode" type="clt_ru:CustomsDocumentCodeType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Код вида документа в соответствии с классификатором, используемом для заполнения таможенных деклараций</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ExpiredDate" type="clt_ru:DateCustType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Срок действия документа</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="NetWeightQuantity" type="clt_ru:QuantityBasisType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Вес нетто по документу</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="GrossWeightQuantity" type="clt_ru:QuantityBasisType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Вес брутто по документу</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="GoodsMeasureQuantity" type="catpi_ru:GoodsMeasureQuantityType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Количество товара по документу в дополнительных единицах измерения</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CodeFOIV" type="clt_ru:CodeVariable7Type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Код ФОИВ, выдавшего документ</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="FOIVName" type="clt_ru:FreeText250Type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Наименование ФОИВ, выдавшего документ</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="VeterinaryInfoType">
+		<xs:annotation>
+			<xs:documentation>Сведения о лекарственном препарате, субстанции, добавке, корме</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cat_ru:DocumentBaseType">
+				<xs:sequence>
+					<xs:element name="ExpiredDate" type="clt_ru:DateCustType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Срок действия документа</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Description" type="clt_ru:FreeText250Type" minOccurs="0" maxOccurs="4">
+						<xs:annotation>
+							<xs:documentation>Торговое наименование</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Series" type="clt_ru:Text150Type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Учетная серия добавки</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Manufacturer" type="RUScat_ru:RUOrganizationNameAddrType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Производитель</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ControlNoCustomsType">
+		<xs:annotation>
+			<xs:documentation>Сведения об иных видах контроля</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="SanitaryQuarantine" type="catpi_ru:SanitaryQuarantineType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Cанитарно-карантинный контроль</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Veterinary" type="catpi_ru:VeterinaryType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Ветеринарный контроль</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FitoSanitary" type="catpi_ru:FitoSanitaryType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Фитосанитарный контроль</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SanitaryQuarantineType">
+		<xs:annotation>
+			<xs:documentation>Cанитарно-карантинный контроль</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="DocPermit" type="catpi_ru:DocPermitType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Cвидетельство о государственной регистрации документа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OriginPlace" type="clt_ru:NameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Место производства / выращивания</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Producer" type="RUScat_ru:SubjectDetailsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Изготовитель</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GoodsPurpose" type="clt_ru:FreeText250Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Назначение товаров</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GoodsScope" type="clt_ru:FreeText250Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Область применения товаров</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FoodGoods" type="clt_ru:FreeText250Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Характеристика пищевых продуктов</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PromGoods" type="clt_ru:FreeText250Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Характеристика промышленных товаров</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DateSeaDecl" type="clt_ru:DateCustType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата морской медико-санитарной декларации</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Ports" type="catpi_ru:CountryPortInfoType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Порты захода</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DangerPort" type="catpi_ru:CountryPortInfoType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Информация о заходе судна на зараженную территорию</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DangerDate" type="clt_ru:DateCustType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата захода судна на зараженную территорию</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Immunity" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак наличия действующего Свидетельства об освобождении судна от санитарного контроля/Свидетельства о прохождении судном санитарного контроля</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Effect" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак достаточности и эффективности проведенных экипажем мер по устранению ранее выявленных и указанных в свидетельстве рисков в области санитарно-эпидемиологического благополучия</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Raid" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак необходимости размещения на санитарном причале (рейде)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FreePass" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак принятия решения о разрешении свободной практики в порту в отношении пассажиров и членов экипажа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Equipment" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак противоэпидемической готовности транспортных средств (наличие противоэпидемического имущества)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="insecticide" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак достаточности инсектицидных препаратов и средств индивидуальной защиты</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Prevention" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак подготовки членов экипажей судов по вопросам профилактики и проведения противоэпидемических мероприятий</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Insects" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак защиты водного судна от проникновения и распространения 
+насекомых – переносчиков возбудителей инфекционных болезней
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Disinfestation" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак проведения профилактической дезинсекции судна и по эпидемиологическим показаниям
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DisinfestationSert" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак наличия сертификата дезинсекции с последействием
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RepeatInspection" type="clt_ru:IndicatorType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак необходимости повторной инспекции
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="VeterinaryType">
+		<xs:annotation>
+			<xs:documentation>Ветеринарный контроль</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="DocPermit" type="catpi_ru:DocPermitType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Разрешение на ввоз </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="VeterinaryAdd" type="catpi_ru:DocPermitType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Ветеринарный сопроводительный документ</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Marking" type="clt_ru:FreeText250Type" minOccurs="0" maxOccurs="4">
+				<xs:annotation>
+					<xs:documentation>Сведения о маркировке</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Manufacturer" type="catpi_ru:ManufacturerType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Производитель / Переработчик</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="VeterinaryInfo" type="catpi_ru:VeterinaryInfoType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Сведения о лекарственном препарате, субстанции, добавке, корме</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FitoSanitaryType">
+		<xs:annotation>
+			<xs:documentation>Фитосанитарный контроль</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="FitoSanitaryDoc" type="catpi_ru:DocPermitType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Фитосанитарный сертификат страны-экспортера</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FitoCountryCode" type="clt_ru:CountryA2CodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Буквенный код страны, выдавшей сертификат</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FitoCountryName" type="clt_ru:CountryNameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование страны, выдавшей сертификат</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OriginPlace" type="clt_ru:NameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Место происхождения</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DepartDate" type="clt_ru:DateCustType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата отгрузки</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DisinfectionInfo" type="clt_ru:FreeText250Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Информация об обеззараживании </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Marking" type="clt_ru:FreeText250Type" minOccurs="0" maxOccurs="4">
+				<xs:annotation>
+					<xs:documentation>Сведения о маркировке</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TransControlType">
+		<xs:annotation>
+			<xs:documentation>Транспортный контроль</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ForeignDoc" type="cat_ru:DocumentBaseType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Разрешение для иностранных перевозчиков</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ForeignKind" type="clt_ru:Numeric1Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Тип разрешения для иностранных перевозчиков (1- двустороннее, 2- транзитное, 3 - в/из третьих стран, 9 - иное)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DangerDoc" type="cat_ru:DocumentBaseType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Cпециальное разрешение на перевозку опасных грузов</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OversizedDoc" type="cat_ru:DocumentBaseType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Cпециальное разрешение на перевозку крупногабаритных грузов</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="HeavyweightDoc" type="cat_ru:DocumentBaseType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Cпециальное разрешение на перевозку тяжеловесных грузов</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RusPermitDoc" type="cat_ru:DocumentBaseType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Карточка допуска российсокго транспортного средства к международным перевозкам грузов</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ManufacturerType">
+		<xs:annotation>
+			<xs:documentation>Производитель/Переработчик</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="RUScat_ru:SubjectDetailsType">
+				<xs:sequence>
+					<xs:element name="ManufacturerKind" type="clt_ru:Numeric1Type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Тип предприятия: 0 - бойня; 1 - холодильник, 2 - перерабатывающее предприятие, 3 - производитель, 9 - иное </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ManufacturerNum" type="clt_ru:FreeText250Type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Номер предприятия</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ManufacturerInfo" type="clt_ru:FreeText250Type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Описание предприятия</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

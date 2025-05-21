@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Created with Liquid XML Studio Developer Edition 9.0.11.3078 (http://www.liquid-technologies.com)-->
+<!--
+Приказ ФТС России от 08.02.2019 г. № 211:
+Приложение 1 (OrderType=0, DocumentType=0) - Поручение таможенного органа на бесспорное взыскание
+Приложение 2 (OrderType=2, DocumentType=0) - Поручение таможенного органа на перевод электронных денежных средств
+Приложение 3 (OrderType=1, DocumentType=0) - Поручение таможенного органа на продажу иностранной валюты
+Приложение 4 (OrderType=0, DocumentType=2) - Решение таможенного органа об отзыве поручения таможенного органа на бесспорное взыскание
+Приложение 5 (OrderType=2, DocumentType=2) - Решение таможенного органа об отзыве инкассового поручения (поручения таможенного органа на перевод электронных денежных средств)
+Письмо ФТС России от 12.09.2018 № 05-62/57789, Федеральный закон от 03.08.2018 г. № 289-ФЗ ст.75 п.13 (без НПА для формы):
+(OrderType=3, DocumentType=0) - Поручение на перечисление денежных средств с депозитного счета на расчетный (текущий) счет плательщика (лица, несущего солидарную обязанность)
+-->
+<xs:schema xmlns:clt_ru="urn:customs.ru:CommonLeafTypes:5.10.0" xmlns:diac="urn:customs.ru:Information:CommercialFinanceDocuments:DebtIncashANDCommission:5.15.0" xmlns:cat_ru="urn:customs.ru:CommonAggregateTypes:5.10.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:customs.ru:Information:CommercialFinanceDocuments:DebtIncashANDCommission:5.15.0" elementFormDefault="qualified" version="5.15.0.0">
+	<xs:import namespace="urn:customs.ru:CommonLeafTypes:5.10.0" schemaLocation="CommonLeafTypesCust.xsd"/>
+	<xs:import namespace="urn:customs.ru:CommonAggregateTypes:5.10.0" schemaLocation="CommonAggregateTypesCust.xsd"/>
+	<xs:annotation>
+		<xs:documentation>Поручение таможенного органа на продажу валюты / на перевод электронных денежных средств / Поручение на бесспорное взыскание / Решение об отзыве поручения на бесспорное взыскание / Решение  об отзыве инкассового поручения (поручения таможенного органа на перевод электронных денежных средств)</xs:documentation>
+	</xs:annotation>
+	<xs:element name="DebtIncashANDCommission" type="diac:DebtIncashANDCommissionType">
+		<xs:annotation>
+			<xs:documentation>Поручение таможенного органа на продажу валюты / на перевод электронных денежных средств / Поручение на бесспорное взыскание / Решение об отзыве поручения на бесспорное взыскание / Решение  об отзыве инкассового поручения (поручения таможенного органа на перевод электронных денежных средств)</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="DebtIncashANDCommissionType">
+		<xs:annotation>
+			<xs:documentation>Поручение таможенного органа на продажу валюты / на перевод электронных денежных средств / Поручение на бесспорное взыскание / Решение об отзыве поручения на бесспорное взыскание / Решение  об отзыве инкассового поручения (поручения таможенного органа на перевод электронных денежных средств)</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cat_ru:BaseDocType">
+				<xs:sequence>
+					<xs:element name="InfoDate" type="clt_ru:DateCustType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Дата формирования сведений</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="InfoTime" type="clt_ru:TimeCustType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Время формирования сведений</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DocumentInfo" type="diac:DocumentInfoType">
+						<xs:annotation>
+							<xs:documentation>Сведения о документе</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="DocumentModeID" type="clt_ru:DocumentModeIDType" use="required" fixed="1002047E">
+					<xs:annotation>
+						<xs:documentation>Идентификатор вида документа</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>Локальные прикладные типы</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="AmountType">
+		<xs:annotation>
+			<xs:documentation>Сумма</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="PaymentAmountText" type="clt_ru:FreeText250Type">
+				<xs:annotation>
+					<xs:documentation>Сумма платежа прописью</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PaymentKBK" type="clt_ru:CodeVariable20Type">
+				<xs:annotation>
+					<xs:documentation>КБК</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PaymentAmount" type="clt_ru:AmountType">
+				<xs:annotation>
+					<xs:documentation>Сумма платежа цифрами</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CodeCurrency" type="clt_ru:Code3Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Код валюты платежа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BaseDocumentType">
+		<xs:annotation>
+			<xs:documentation>Документ основание</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="DecisInconGR" type="cat_ru:DocumentBaseType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Реквизиты решения о бесспорном взыскании</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Indocrn" type="cat_ru:DocumentBaseType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Реквизиты входного документа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DocumentInfoType">
+		<xs:annotation>
+			<xs:documentation>Сведения о документе</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="CustomsOffice" type="cat_ru:CustomsType">
+				<xs:annotation>
+					<xs:documentation>Код и наименование таможенного органа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DocumentType" type="clt_ru:Numeric1Type">
+				<xs:annotation>
+					<xs:documentation>Тип сведений: 0 - документ, 1 - отметка об ознакомлении участника ВЭД с документом, 2 - отзыв документа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OrderType" type="clt_ru:Numeric1Type">
+				<xs:annotation>
+					<xs:documentation>Вид поручения: 0 - поручение на бесспорное взыскание, 1 - поручение на продажу иностранной валюты, 2 - поручение на перевод электронных денежных средств, 3 - поручение на перечисление денежных средств с депозитного счета на расчетный</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RequisitesDocument" type="cat_ru:DocumentBaseType">
+				<xs:annotation>
+					<xs:documentation>Реквизиты документа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DocumentPaymentReqs" type="diac:DocumentPaymentReqsType">
+				<xs:annotation>
+					<xs:documentation>Реквизиты для спиcания и перечисления денежных средств по документу</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BaseDocument" type="diac:BaseDocumentType">
+				<xs:annotation>
+					<xs:documentation>Документ основание</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RecievingSignature" type="cat_ru:PersonSignatureType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Отметка о вручении - подпись представителя организации. Заполняется в Личном Кабинете участника ВЭД</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DocumentSignature" type="diac:DocumentSignatureType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Подпись документов</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DocumentPaymentReqsType">
+		<xs:annotation>
+			<xs:documentation>Банковские реквизиты для оплаты</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="InfoPayer" type="diac:InfoPayerType">
+				<xs:annotation>
+					<xs:documentation>Информация о плательщике</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TransFerfunds" type="diac:TransFerfundsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Перевод денежных средств</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DocumentSignatureType">
+		<xs:annotation>
+			<xs:documentation>Типы подписи документов</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="CustChiefSignature" type="diac:CustChiefSignatureSupplemented">
+				<xs:annotation>
+					<xs:documentation>Подпись Ф.И.О. начальника таможенного органа. Заполняется в АПС Задолженность.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ExecutiveSignature" type="diac:ExecutiveSignatureSupplemented">
+				<xs:annotation>
+					<xs:documentation>Подпись исполнителя. Заполняется в АПС Задолженность.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ExtInformationType">
+		<xs:annotation>
+			<xs:documentation>Дополнительная информация для поручений</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Order1" type="clt_ru:Count10Type">
+				<xs:annotation>
+					<xs:documentation>Поле 1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Order105" type="clt_ru:Count8Type">
+				<xs:annotation>
+					<xs:documentation>105 поле (Реквизит 105 -  ОКАТО)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Order106" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>106 поле (Реквизит 106 - Код основания)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Order108" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>108 поле (Реквизит 108 - Номер документа, на основании которого делается платеж)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Order109" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>109 поле (Реквизит 109 - Дата документа, на основании которого делается платеж))</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InfoPayerType">
+		<xs:annotation>
+			<xs:documentation>Информация о плательщике</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Organization" type="diac:OrganizationMeasType">
+				<xs:annotation>
+					<xs:documentation>Сведения об участнике ВЭД</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BankInfoPayer" type="cat_ru:OrganizationType">
+				<xs:annotation>
+					<xs:documentation>Банк плательщика</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BICBankPayer" type="clt_ru:BICIDType">
+				<xs:annotation>
+					<xs:documentation>БИК банка плательщика</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CodeBankPayer" type="clt_ru:CodeVariable20Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Код банка плательщика по КГРКО</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AccountPayer" type="clt_ru:AccountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Номер счета плательщика</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AccountTypePayer" type="clt_ru:FreeText250Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Вид счета плательщика</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CodeAccountCurrencyPayer" type="clt_ru:Code3Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Код валюты счета плательщика</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CorporatePayer" type="clt_ru:FreeText250Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Корпоративное электронное средство платежа плательщика</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OrganizationMeasType">
+		<xs:annotation>
+			<xs:documentation>Сведения об участнике ВЭД (из меры)</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cat_ru:OrganizationType">
+				<xs:sequence>
+					<xs:element name="ITN" type="clt_ru:ITNType">
+						<xs:annotation>
+							<xs:documentation>ИТН</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="TransFerfundsType">
+		<xs:annotation>
+			<xs:documentation>Реквизиты перевода денежных средств</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="TransFerReqs" type="diac:TransFerReqsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Реквизиты</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Amount" type="diac:AmountType">
+				<xs:annotation>
+					<xs:documentation>Сумма</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TransFerReqsType">
+		<xs:annotation>
+			<xs:documentation>Реквизиты</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="AccountRecipient" type="clt_ru:AccountType">
+				<xs:annotation>
+					<xs:documentation>Номер счета получателя</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CodeAccountCurrency" type="clt_ru:Code3Type">
+				<xs:annotation>
+					<xs:documentation>Код валюты счета получателя</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AccountTypePayer" type="clt_ru:FreeText250Type">
+				<xs:annotation>
+					<xs:documentation>Тип счета получателя</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DetailInformation" type="diac:DetailInformationType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Детализация</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CustChiefSignatureSupplemented">
+		<xs:annotation>
+			<xs:documentation>Подпись Ф.И.О. начальника таможенного органа. Заполняется в АПС Задолженность.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cat_ru:PersonSignatureType">
+				<xs:sequence>
+					<xs:element name="Rank" type="clt_ru:FreeText250Type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Cпециальное звание</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ExecutiveSignatureSupplemented">
+		<xs:annotation>
+			<xs:documentation>Подпись Ф.И.О. начальника таможенного органа. Заполняется в АПС Задолженность.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cat_ru:PersonSignatureType">
+				<xs:sequence>
+					<xs:element name="Phone" type="clt_ru:PhoneNumberType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Номер телефона исполнителя</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="DetailInformationType">
+		<xs:annotation>
+			<xs:documentation>Детализация</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="sKorAccountBankPayer" type="clt_ru:AccountType">
+				<xs:annotation>
+					<xs:documentation>Номер счета банка плательщика</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BankInfoRecipient" type="clt_ru:FreeText250Type">
+				<xs:annotation>
+					<xs:documentation>Банк получателя</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BICBankRecipient" type="clt_ru:BICIDType">
+				<xs:annotation>
+					<xs:documentation>БИК банка получателя</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RecipientName" type="clt_ru:FreeText250Type">
+				<xs:annotation>
+					<xs:documentation>Наименование получателя платежа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RecipientINN" type="clt_ru:INNIDType">
+				<xs:annotation>
+					<xs:documentation>ИНН получателя</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RecipientKPP" type="clt_ru:KPPCodeType">
+				<xs:annotation>
+					<xs:documentation>КПП получателя</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TypeOfOperation" type="clt_ru:Count2Type">
+				<xs:annotation>
+					<xs:documentation>Вид операции</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PaymentCode" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>Код платежа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PriorityPayment" type="clt_ru:Count2Type">
+				<xs:annotation>
+					<xs:documentation>Очередность платежа</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ExtInformation" type="diac:ExtInformationType">
+				<xs:annotation>
+					<xs:documentation>Дополнительная информация</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

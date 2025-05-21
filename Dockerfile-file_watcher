@@ -1,0 +1,40 @@
+﻿# Указываем версию SDK и ASP.NET через аргументы
+ARG DOTNET_VERSION=7.0
+
+# ===== СТАДИЯ 1: Сборка =====
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
+ARG DOTNET_VERSION
+WORKDIR /source
+
+# Копируем .csproj сначала для кэшируемого restore
+COPY ./DocumentXmlProcessorContext/DocumentXmlProcessorContext.csproj ./DocumentXmlProcessorContext/
+COPY ./ProcessingCommon/ProcessingCommon.csproj ./ProcessingCommon/
+COPY ./OldFIleWatcher/OldFIleWatcher.csproj ./OldFIleWatcher/
+COPY nuget.config ./nuget.config
+
+RUN dotnet restore ./OldFIleWatcher/OldFIleWatcher.csproj --configfile ./nuget.config
+
+# Копируем остальной код
+COPY ./DocumentXmlProcessorContext ./DocumentXmlProcessorContext/
+COPY ./ProcessingCommon ./ProcessingCommon/
+COPY ./OldFIleWatcher ./OldFIleWatcher/
+
+WORKDIR /source/OldFIleWatcher
+#RUN dotnet publish -c release -o /app --no-restore
+RUN dotnet publish -c Release -o /app --no-restore --configfile ../nuget.config
+
+# ===== СТАДИЯ 2: Runtime =====
+#FROM mcr.microsoft.com/dotnet/aspnet:7.0
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS runtime
+WORKDIR /app
+
+# Копируем собранное приложение
+COPY --from=build /app ./
+
+# Копируем конфигурацию (если есть)
+COPY ./OldFIleWatcher/appsettings.json ./
+
+# Healthcheck — проверка, что контейнер жив
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s CMD curl --fail http://localhost:5000/health || exit 1
+
+ENTRYPOINT ["dotnet", "OldFIleWatcher.dll"]

@@ -1,0 +1,22 @@
+﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /source
+
+COPY ./ProcessingCommon ./ProcessingCommon/
+COPY ./PdfProcessor ./PdfProcessor/
+COPY ./XsltProcessor ./XsltProcessor/
+COPY ./DocumentXmlProcessorAPI ./DocumentXmlProcessorAPI/
+COPY ./DocumentXmlProcessorContext ./DocumentXmlProcessorContext/
+RUN dotnet restore ProcessingCommon/ProcessingCommon.csproj
+RUN dotnet restore PdfProcessor/PdfProcessor.csproj
+RUN dotnet restore XsltProcessor/XsltProcessor.csproj
+RUN dotnet restore DocumentXmlProcessorAPI/DocumentXmlProcessorAPI.csproj
+RUN dotnet restore DocumentXmlProcessorContext/DocumentXmlProcessorContext.csproj
+
+WORKDIR /source/XsltProcessor
+RUN dotnet publish -c release -o /app --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
+WORKDIR /app
+COPY --from=build /app ./
+COPY ./XsltProcessor/appsettings.json ./
+ENTRYPOINT ["dotnet", "XsltProcessor.dll"]

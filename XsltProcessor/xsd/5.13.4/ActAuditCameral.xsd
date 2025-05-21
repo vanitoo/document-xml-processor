@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Приложение №2 к приказу ФТС России от 30.12.2010 г. №2713 [в ред.приказа ФТС России от 03.10.2011 №2011] (ОТМЕНЕНО) 
+Новый приказ пока без номера  -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:clt_ru="urn:customs.ru:CommonLeafTypes:5.10.0" xmlns:cat_ru="urn:customs.ru:CommonAggregateTypes:5.10.0" xmlns:adt_cat="urn:customs.ru:Information:CustomsAuditDocuments:AuditCommonAggregateTypesCust:5.13.3" xmlns:aac="urn:customs.ru:Information:CustomsAuditDocuments:ActAuditCameral:5.13.3" targetNamespace="urn:customs.ru:Information:CustomsAuditDocuments:ActAuditCameral:5.13.3" elementFormDefault="qualified" version="5.13.3.0">
+	<xs:import namespace="urn:customs.ru:CommonLeafTypes:5.10.0" schemaLocation="CommonLeafTypesCust.xsd"/>
+	<xs:import namespace="urn:customs.ru:CommonAggregateTypes:5.10.0" schemaLocation="CommonAggregateTypesCust.xsd"/>
+	<xs:import namespace="urn:customs.ru:Information:CustomsAuditDocuments:AuditCommonAggregateTypesCust:5.13.3" schemaLocation="AuditCommonAggregateTypesCust.xsd"/>
+	<xs:annotation>
+		<xs:documentation>Акт таможенной проверки (камеральной или выездной)</xs:documentation>
+	</xs:annotation>
+	<xs:element name="ActAuditCameral" type="aac:ActAuditCameralType"/>
+	<xs:complexType name="ActAuditCameralType">
+		<xs:annotation>
+			<xs:documentation>Акт таможенной проверки (камеральной или выездной)</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cat_ru:BaseDocType">
+				<xs:sequence>
+					<xs:element name="IdentKindAudit" type="clt_ru:LetterIndicatorType">
+						<xs:annotation>
+							<xs:documentation>Вид таможенной проверки: 1-выездная; 2-камеральная</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AuditFieldKind" type="clt_ru:Numeric1Type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Вид выездной проверки: 1 - выездная плановая; 2 - выездная внеплановая; 3 - выездная встречная внеплановая</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DecisionPerformAudit" type="adt_cat:NumberType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Решение о проведении таможенной проверки</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ActNumber" type="adt_cat:NumberType">
+						<xs:annotation>
+							<xs:documentation>Номер акта таможенной проверки</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ActPlace" type="clt_ru:NameType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Место составления акта проверки</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="BeginAuditDate" type="clt_ru:DateCustType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Дата начала таможенной проверки</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="EndAuditDate" type="clt_ru:DateCustType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Дата окончания таможенной проверки</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="StopProlongAudit" type="aac:StopProlongAuditType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Проверка приостановлена/продлена до указанной даты</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AuditPeriod" type="adt_cat:AuditPeriodType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Проверяемый период</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Article" type="clt_ru:Count5Type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Статья ТК, на основании которой проводится проверка</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ListCommission" type="adt_cat:PersonType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Должностные лица, проводившие проверку</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ListAttractedPersons" type="adt_cat:PersonType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Привлеченные должностные лица</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AuditOrganization" type="adt_cat:AuditOrganizationType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Сведения об юридическом/физическом лице, в отношении которого проведена проверка</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Questions" type="aac:QuestionsType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Поставленные вопросы</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AuditDocuments" type="aac:AuditDocType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Виды проверенных документов и сведений</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AuditActions" type="aac:AuditActionType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Мероприятия, проведенные в ходе таможенной проверки</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AuditDisorders" type="adt_cat:DisorderType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Описание выявленных фактов (признаков) нарушения</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DamageTotalAmount" type="clt_ru:AmountType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Суммарный предварительный ущерб</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DamageCurrencyCode" type="clt_ru:CurrencyN3CodeType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Цифровой код валюты суммарного предварительного ущерба</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AdminViolations" type="aac:AdminViolationType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Возбужденные дела об административных правонарушениях</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Resolution" type="clt_ru:FreeText250Type" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Выводы и предложения</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AdditionalSheetNumber" type="clt_ru:Count3Type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Количество листов приложений</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="OtherInfo" type="clt_ru:FreeText250Type" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Иные сведения</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CommissionSignature" type="cat_ru:PersonSignatureType" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Должностные лица, подписавшие акт</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="SecExempDate" type="clt_ru:DateCustType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Дата получения второго экземпляра</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="SecExempTime" type="clt_ru:TimeCustType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Время получения второго экземпляра</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="SecondExempReceived" type="adt_cat:SecondExempReceivedType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Второй экземпляр акта на руки получил</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Customs" type="cat_ru:CustomsType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Место составления акта (Таможенный орган, осуществивший проверку)</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CustomsPerson" type="cat_ru:CustomsPersonType">
+						<xs:annotation>
+							<xs:documentation>Сведения о должностном лице таможенного органа, составившем акт</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="DocumentModeID" type="clt_ru:DocumentModeIDType" use="required" fixed="1006901E">
+					<xs:annotation>
+						<xs:documentation>Идентификатор вида документа</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>Локальные прикладные типы.</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="AdminViolationType">
+		<xs:annotation>
+			<xs:documentation>Возбужденное дело об административном правонарушении</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="DisorderDescription" type="cat_ru:DocumentBaseType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование, номер и дата протокола (определения)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AKParts" type="clt_ru:FreeText250Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Статьи Административного кодекса РФ, предусматривающая административную ответственность</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ViolationComments" type="clt_ru:FreeText250Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Комментарии</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AuditActionType">
+		<xs:annotation>
+			<xs:documentation>Мероприятие, проведенное в ходе проверки</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ActionDescription" type="clt_ru:FreeText250Type">
+				<xs:annotation>
+					<xs:documentation>Описание мероприятия</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ControlMark" type="clt_ru:CodeVariable2Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Код формы таможенного контроля </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ActionComments" type="clt_ru:FreeText250Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Комментарии</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AuditDocType">
+		<xs:annotation>
+			<xs:documentation>Документ/сведения</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cat_ru:DocumentBaseType">
+				<xs:sequence>
+					<xs:element name="DocCode" type="clt_ru:CustomsDocumentCodeType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Код вида документа (заполняется в соответствии с классификатором видов документов, используемых при заявлении сведений в графе 44)</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Note" type="clt_ru:FreeText250Type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Примечание</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="QuestionsType">
+		<xs:annotation>
+			<xs:documentation>Вопросы проверки</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="QuestionCode" type="clt_ru:CodeVariable6Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Код вопроса проверки  </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="QuestionText" type="clt_ru:FreeText500Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Вопрос проверки (тект)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Note" type="clt_ru:FreeText500Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Примечание</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="StopProlongAuditType">
+		<xs:annotation>
+			<xs:documentation>Приостановление/продление проверки</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ActionKind" type="clt_ru:Numeric1Type">
+				<xs:annotation>
+					<xs:documentation>1 - приостановление проверки; 2 - продление продление проверки</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopProlongDate" type="clt_ru:DateCustType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата, до которой приостанавливается/продляется проверка</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
