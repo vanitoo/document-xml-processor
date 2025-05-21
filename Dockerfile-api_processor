@@ -6,13 +6,12 @@ COPY ./ProcessingCommon ./ProcessingCommon/
 COPY ./DocumentXmlProcessorAPI ./DocumentXmlProcessorAPI/
 COPY nuget.config ./nuget.config
 
-RUN dotnet restore DocumentXmlProcessorAPI/DocumentXmlProcessorAPI.csproj \
-    && dotnet restore DocumentXmlProcessorContext/DocumentXmlProcessorContext.csproj \
-    && dotnet restore ProcessingCommon/ProcessingCommon.csproj
+RUN dotnet restore DocumentXmlProcessorContext/DocumentXmlProcessorContext.csproj
+RUN dotnet restore ProcessingCommon/ProcessingCommon.csproj
+RUN dotnet restore DocumentXmlProcessorAPI/DocumentXmlProcessorAPI.csproj
 
 WORKDIR /source/DocumentXmlProcessorAPI
-RUN dotnet publish -c Release -o /app --no-restore --configfile ../nuget.config
-
+RUN dotnet publish DocumentXmlProcessorAPI.csproj -c Release -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app
