@@ -1,12 +1,13 @@
-﻿using System.Reflection;
+﻿using Microsoft.Extensions.Logging;
+using ProcessingCommon.Models.Data;
+using System.Reflection;
 using System.Runtime.InteropServices.JavaScript;
 using System.Security.AccessControl;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Xsl;
-using Microsoft.Extensions.Logging;
-using ProcessingCommon.Models.Data;
 using XsltProcessor.Extensions;
 
 namespace XsltProcessor.Processing;
@@ -81,6 +82,10 @@ public class XsltBuilder
                         result = AddExtField3("Таможенный орган отправления", data.CustomCode, result, ref lastReplacementPosition);
                         result = AddExtField3("Таможенный орган отправления", data.StatusName, result, ref lastReplacementPosition);
                         result = AddExtField3("Таможенный орган отправления",data.CustomsOffical, result, ref lastReplacementPosition);
+
+                        result = DeleteElements("Таможенный орган назначения", result, ref lastReplacementPosition);
+                        result = AddElement("Таможенный орган назначения", data.DestinationCustom, result, ref lastReplacementPosition);
+                        result = AddElement("Таможенный орган назначения", data.DestinationStation, result, ref lastReplacementPosition);
 
                         result = AddExtField3("Отметки таможенного органа отправления", "1:" + data.DestinationPlace, result, ref lastReplacementPosition);
                         result = AddExtField3("Отметки таможенного органа отправления", "2:Срок таможенного транзита: " + data.TransitDateLimit, result, ref lastReplacementPosition);
@@ -224,6 +229,30 @@ public class XsltBuilder
                    + result.Substring(end);
         }
         else { return result; }
+    }
+
+    private static string AddElement(string refValue, string addValue, string result, ref int lastReplacementPosition)
+    {
+        int _base = result.IndexOf(refValue, lastReplacementPosition);
+        if (_base >= 0)
+        {
+            int start = result.IndexOf("</td>", _base);
+            return result.Substring(0, start) + "<div><element>" + addValue + "</element></div>" + result.Substring(start);
+        }
+        else
+            return result;
+    }
+
+    private static string DeleteElements(string refValue, string result, ref int lastReplacementPosition)
+    {
+        int _base = result.IndexOf(refValue, lastReplacementPosition);
+        int start = _base;
+        int end = result.IndexOf("</td>", _base);
+        string str = result.Substring(start, end - start);
+        string pattern = @"(?:<element\b[^>]*>.*?</element>\s*|,?\s*<br\s*/?>\s*|,\s*)";
+        str = Regex.Replace(str, pattern, string.Empty, RegexOptions.Singleline);
+        lastReplacementPosition = _base;
+        return result.Substring(0, start) + $"{str}" + result.Substring(end);
     }
     private static string AddExtField3(string refValue, string replaceValue, string result, ref int lastReplacementPosition)
     {

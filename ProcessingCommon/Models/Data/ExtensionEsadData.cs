@@ -13,5 +13,7 @@ public class ExtensionEsadData
     public string? TransitDateLimit { get; set; }
     public string? Signature { get; set; }
     public string? DestinationPlace { get; set; }
+    public string? DestinationCustom { get; set; }
+    public string? DestinationStation { get; set; }
     public Dictionary<string, string>? DictCountry { get; set; }
 }
