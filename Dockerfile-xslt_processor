@@ -1,21 +1,22 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /source
 
-COPY ./ProcessingCommon ./ProcessingCommon/
-COPY ./PdfProcessor ./PdfProcessor/
-COPY ./XsltProcessor ./XsltProcessor/
-COPY ./DocumentXmlProcessorAPI ./DocumentXmlProcessorAPI/
-COPY ./DocumentXmlProcessorContext ./DocumentXmlProcessorContext/
-RUN dotnet restore ProcessingCommon/ProcessingCommon.csproj
-RUN dotnet restore PdfProcessor/PdfProcessor.csproj
+# Copy only necessary .csproj files for caching
+COPY ./ProcessingCommon/ProcessingCommon.csproj ./ProcessingCommon/
+COPY ./XsltProcessor/XsltProcessor.csproj ./XsltProcessor/
+
+# Restore dependencies
 RUN dotnet restore XsltProcessor/XsltProcessor.csproj
-RUN dotnet restore DocumentXmlProcessorAPI/DocumentXmlProcessorAPI.csproj
-RUN dotnet restore DocumentXmlProcessorContext/DocumentXmlProcessorContext.csproj
+
+# Copy only necessary source code after restore
+COPY ./ProcessingCommon ./ProcessingCommon/
+COPY ./XsltProcessor ./XsltProcessor/
 
 WORKDIR /source/XsltProcessor
-RUN dotnet publish -c release -o /app --no-restore
+RUN dotnet publish -c $BUILD_CONFIGURATION -o /app --no-restore
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app
 COPY --from=build /app ./
 COPY ./XsltProcessor/appsettings.json ./

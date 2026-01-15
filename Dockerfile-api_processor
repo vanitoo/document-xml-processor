@@ -1,17 +1,23 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /source
 
+# Copy .csproj files for caching
+COPY ./DocumentXmlProcessorContext/DocumentXmlProcessorContext.csproj ./DocumentXmlProcessorContext/
+COPY ./ProcessingCommon/ProcessingCommon.csproj ./ProcessingCommon/
+COPY ./DocumentXmlProcessorAPI/DocumentXmlProcessorAPI.csproj ./DocumentXmlProcessorAPI/
+COPY nuget.config ./
+
+# Restore dependencies
+RUN dotnet restore DocumentXmlProcessorAPI/DocumentXmlProcessorAPI.csproj
+
+# Copy source code after restore
 COPY ./DocumentXmlProcessorContext ./DocumentXmlProcessorContext/
 COPY ./ProcessingCommon ./ProcessingCommon/
 COPY ./DocumentXmlProcessorAPI ./DocumentXmlProcessorAPI/
-COPY nuget.config ./nuget.config
-
-RUN dotnet restore DocumentXmlProcessorContext/DocumentXmlProcessorContext.csproj
-RUN dotnet restore ProcessingCommon/ProcessingCommon.csproj
-RUN dotnet restore DocumentXmlProcessorAPI/DocumentXmlProcessorAPI.csproj
 
 WORKDIR /source/DocumentXmlProcessorAPI
-RUN dotnet publish DocumentXmlProcessorAPI.csproj -c Release -o /app
+RUN dotnet publish DocumentXmlProcessorAPI.csproj -c $BUILD_CONFIGURATION -o /app --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app

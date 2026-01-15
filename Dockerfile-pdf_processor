@@ -1,13 +1,20 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /source
 
-COPY ./ProcessingCommon ./ProcessingCommon/
-COPY ./PdfProcessor ./PdfProcessor/
-RUN dotnet restore ProcessingCommon/ProcessingCommon.csproj
+# Copy .csproj files for caching
+COPY ./ProcessingCommon/ProcessingCommon.csproj ./ProcessingCommon/
+COPY ./PdfProcessor/PdfProcessor.csproj ./PdfProcessor/
+
+# Restore dependencies
 RUN dotnet restore PdfProcessor/PdfProcessor.csproj
 
+# Copy source code after restore
+COPY ./ProcessingCommon ./ProcessingCommon/
+COPY ./PdfProcessor ./PdfProcessor/
+
 WORKDIR /source/PdfProcessor
-RUN dotnet publish -c release -o /app --no-restore
+RUN dotnet publish -c $BUILD_CONFIGURATION -o /app --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
