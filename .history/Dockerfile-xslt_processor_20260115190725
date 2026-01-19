@@ -6,9 +6,6 @@ WORKDIR /source
 COPY ./ProcessingCommon/ProcessingCommon.csproj ./ProcessingCommon/
 COPY ./XsltProcessor/XsltProcessor.csproj ./XsltProcessor/
 
-
-
-
 # Restore dependencies
 RUN dotnet restore XsltProcessor/XsltProcessor.csproj
 
