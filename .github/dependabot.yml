@@ -79,6 +79,9 @@ updates:
     labels:
       - "docker"
       - "dependencies"
+    ignore:
+      - dependency-name: "mcr.microsoft.com/dotnet/*"
+        versions: [">=8.0"]
 
   - package-ecosystem: "docker"
     directory: "/XsltProcessor"
@@ -91,6 +94,9 @@ updates:
     labels:
       - "docker"
       - "dependencies"
+    ignore:
+      - dependency-name: "mcr.microsoft.com/dotnet/*"
+        versions: [">=8.0"]
 
   - package-ecosystem: "docker"
     directory: "/PdfProcessor"
@@ -103,6 +109,9 @@ updates:
     labels:
       - "docker"
       - "dependencies"
+    ignore:
+      - dependency-name: "mcr.microsoft.com/dotnet/*"
+        versions: [">=8.0"]
 
   - package-ecosystem: "docker"
     directory: "/OldFIleWatcher"
@@ -115,5 +124,6 @@ updates:
     labels:
       - "docker"
       - "dependencies"
-
-
+    ignore:
+      - dependency-name: "mcr.microsoft.com/dotnet/*"
+        versions: [">=8.0"]

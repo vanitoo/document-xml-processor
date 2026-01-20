@@ -1,0 +1,70 @@
+jenkins:
+  systemMessage: "🌟 Jenkins настроен автоматически через JCasC"
+  numExecutors: 2
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: admin
+          name: admin
+          password: admin
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  remotingSecurity:
+    enabled: true
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              id: docker-registry-creds
+              username: dockeruser
+              password: dockerpass
+              description: "Доступ к приватному реестру Docker"
+
+      - domain:
+          name: "global"
+          specifications: []
+        credentials:
+          - usernamePassword:
+              id: "github-creds"
+              username: "${GH_USER}"
+              password: "${GH_PAT}"
+              description: "GitHub PAT for checkout"
+          # если нужен docker login в приватный реестр:
+          # - usernamePassword:
+          #     id: "docker-registry"
+          #     username: "${REG_USER}"
+          #     password: "${REG_PASS}"
+
+jobs:
+  - script: >
+      pipelineJob('build-and-push-net') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/vanitoo/document-xml-processor.git')
+                  credentials('github-creds')
+                }
+                branches('*/master')
+              }
+            }
+            lightweight(true)
+          }
+        }
+      }
+
+
+
+tool:
+  git:
+    installations:
+      - name: "Default"
+        home: "/usr/bin/git"

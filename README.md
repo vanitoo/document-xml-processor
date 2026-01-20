@@ -63,6 +63,37 @@ docker push 192.168.12.104:5050/build-xslt-processing-latest
 docker push 192.168.12.104:5050/build-document-xml-processor-api-latest
 ```
 
+## CI/CD Pipeline
+
+Проект использует Jenkins для автоматизированной сборки и публикации Docker-образов.
+
+### Jenkins Pipeline (`Jenkinsfile`)
+
+Пайплайн выполняет следующие шаги:
+
+1. **Checkout**: Загружает код из репозитория GitHub.
+2. **Set Version**: Читает версию из файла `VERSION`.
+3. **Build, Tag, Push** для каждого сервиса:
+   - `file_watcher`
+   - `pdf_processor`
+   - `xslt_processor`
+   - `api_processor`
+
+Для каждого сервиса:
+- Собирает Docker-образ с тегом `${VERSION}` на основе соответствующего `Dockerfile-*`.
+- Создаёт теги для реестра: `${REGISTRY}/service:${VERSION}` и `${REGISTRY}/service:latest`.
+- Публикует образы в реестр `192.168.12.104:5050`.
+
+### Запуск пайплайна
+
+Пайплайн запускается автоматически при пуше в репозиторий или вручную в Jenkins UI.
+
+После успешного выполнения необходимо вручную обновить и перезапустить сервисы:
+```bash
+docker-compose pull
+docker-compose up -d
+```
+
 ## Запуск
 
 ```bash

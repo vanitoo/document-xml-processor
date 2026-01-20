@@ -1,0 +1,19 @@
+[ req ]
+default_bits       = 2048
+distinguished_name = req_distinguished_name
+x509_extensions    = v3_req
+prompt             = no
+
+[ req_distinguished_name ]
+C  = RU
+ST = Example
+L  = City
+O  = Company
+OU = IT
+CN = 192.168.12.104
+
+[ v3_req ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+IP.1 = 192.168.12.104
