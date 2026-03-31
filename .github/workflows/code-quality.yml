@@ -1,0 +1,80 @@
+name: Code Quality
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - '**.cs'
+      - '**.csproj'
+      - '**.props'
+      - '**.config'
+  pull_request:
+    paths:
+      - '**.cs'
+      - '**.csproj'
+      - '**.props'
+      - '**.config'
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --no-restore --verbosity minimal
+
+      - name: Run Roslynator
+        run: |
+          dotnet tool install --global Roslynator.DotNet.Cli --version 4.6.1
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          roslynator analyze . --severity warning --visibility internal,public 2>&1 | tee roslynator.log
+          echo "Roslynator analysis completed"
+
+      - name: Upload Roslynator results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roslynator-results
+          path: roslynator.log
+          retention-days: 7
+
+      - name: Upload SARIF file
+        uses: actions/upload-artifact@v4
+        with:
+          name: sarif-results
+          path: '**/*.sarif'
+          retention-days: 30
+
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Check code formatting
+        run: |
+          dotnet tool install --global dotnet-format --version 7.0.453106
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          dotnet format --verify-no-changes --verbosity diagnostic

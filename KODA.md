@@ -30,7 +30,7 @@
 - **RabbitMQ** для обмена сообщениями
 - **Docker** + docker-compose
 - **NLog** для логирования
-- **Jenkins** для CI/CD
+- **GitHub Actions** для CI/CD
 
 ---
 
@@ -64,7 +64,21 @@ XML-файл → OldFileWatcher (мониторинг) →
 
 ### Сборка проекта
 
-#### Вариант 1: Скрипт BuildAndPublish.cmd
+#### Вариант 1: GitHub Actions (рекомендуется)
+
+При пуше в `main` или создании тега `v*` автоматически запускается сборка:
+
+```bash
+# Создание тега для сборки и публикации
+git tag v8.10
+git push origin v8.10
+```
+
+Образы публикуются в GitHub Container Registry:
+- `ghcr.io/{owner}/document-xml-processor/{service}:{version}`
+- `ghcr.io/{owner}/document-xml-processor/{service}:latest`
+
+#### Вариант 2: Скрипт BuildAndPublish.cmd
 
 ```cmd
 BuildAndPublish.cmd
@@ -76,7 +90,7 @@ BuildAndPublish.cmd
 3. Тегирование образов с версией и latest
 4. Публикацию в приватный registry (192.168.12.104:5050)
 
-#### Вариант 2: Docker Compose
+#### Вариант 3: Docker Compose
 
 ```bash
 docker-compose build
@@ -104,7 +118,7 @@ API будет доступно на порту 5000.
 
 ### Особенности Docker-сборки
 
-- **Требование прекомпиляции**: Dockerfiles копируют бинарники из директорий `obj/Debug/`, поэтому исходный код должен быть предварительно скомпилирован.
+- **Multi-stage build**: Dockerfiles используют multi-stage сборку — компиляция происходит внутри контейнера, предварительная компиляция не требуется.
 - **Выходные файлы**: Для корректной работы XsltProcessor в выходную директорию должны быть скопированы директории `xsd/**` и `xslt/**` (настроено в `.csproj` как `CopyToOutputDirectory=Always`).
 
 ---
@@ -142,33 +156,65 @@ API будет доступно на порту 5000.
 
 ## 5. CI/CD
 
-### Jenkins Pipeline
+### GitHub Actions (основной)
 
-Проект использует Jenkins для автоматизированной сборки и публикации Docker-образов. Пайплайн определён в `Jenkinsfile` и выполняет:
+Проект использует GitHub Actions для автоматизированной сборки и публикации Docker-образов. Workflow определён в `.github/workflows/docker.yml` и выполняет:
 
-1. **Checkout** — загрузка кода из GitHub
-2. **Set Version** — чтение версии из файла `VERSION`
-3. **Build, Tag, Push** для каждого сервиса:
+1. **Checkout** — загрузка кода из репозитория
+2. **Get Version** — чтение версии из файла `VERSION`
+3. **Build** — сборка для каждого сервиса:
    - file_watcher
    - pdf_processor
    - xslt_processor
    - api_processor
+4. **Push** — публикация образов в GitHub Container Registry
 
-### Публикация в registry
+#### Триггеры запуска
 
-Образы публикуются в приватный registry: `192.168.12.104:5050`
+- Пуш в ветку `main` или `master` — сборка без пуша в registry
+- Создание тега `v*` (например, `v8.10`) — сборка с пушем в registry
+
+#### Публикация в registry
+
+Образы публикуются в GitHub Container Registry: `ghcr.io/{owner}/document-xml-processor`
 
 Теги:
-- `${SERVICE}:${VERSION}` — конкретная версия
+- `${SERVICE}:${VERSION}` — конкретная версия (например, `ghcr.io/owner/document-xml-processor/api_processor:8.9`)
 - `${SERVICE}:latest` — latest
+- `${SERVICE}:sha-*` — хеш коммита
 
-### Ручное обновление после CI
+### Jenkins Pipeline (резервный)
 
-После успешного выполнения Jenkins pipeline необходимо вручную обновить сервисы:
+Для обратной совместимости сохранён Jenkins pipeline в `Jenkinsfile`. Публикует в приватный registry `192.168.12.104:5050`.
+
+### Обновление сервисов из GitHub
+
+После успешного выполнения GitHub Actions (при пуше тега) необходимо обновить сервисы:
 
 ```bash
-docker-compose pull
+# Логин в GitHub Container Registry
+echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+
+# Pull новых образов
+docker pull ghcr.io/{owner}/document-xml-processor/file_watcher:latest
+docker pull ghcr.io/{owner}/document-xml-processor/pdf_processor:latest
+docker pull ghcr.io/{owner}/document-xml-processor/xslt_processor:latest
+docker pull ghcr.io/{owner}/document-xml-processor/api_processor:latest
+
+# Перезапуск docker-compose
 docker-compose up -d
+```
+
+#### Обновление с конкретной версией
+
+```bash
+# Укажите версию из файла VERSION
+VERSION=$(cat VERSION)
+docker-compose -f docker-compose.yml pull
+docker-compose -f docker-compose.yml up -d
+
+# Или с явным указанием версии
+docker pull ghcr.io/{owner}/document-xml-processor/api_processor:8.9
 ```
 
 ---
@@ -177,8 +223,9 @@ docker-compose up -d
 
 ### Стиль кодирования
 
-- Используется стандартный стиль .NET/C# без явных правил code style enforcement
+- Используется EditorConfig (`.editorconfig`) для единого стиля кода
 - Основа — соглашения Microsoft для C#
+- Рекомендуется использовать file-scoped namespaces
 
 ### Тестирование
 
@@ -188,12 +235,36 @@ docker-compose up -d
 
 ### Линтинг
 
-- **Линтеры и инструменты проверки стиля не настроены**
+Проект использует следующие инструменты:
+
+- **EditorConfig** (`.editorconfig`) — базовые правила форматирования и стиля
+- **Roslynator.Analyzers** — анализ качества кода (подключён через `Directory.Build.props`)
+- **Microsoft.CodeAnalysis.NetAnalyzers** — встроенные .NET анализаторы
+- **dotnet-format** — проверка форматирования
+
+#### Запуск линтеров локально
+
+```bash
+# Установка инструментов
+dotnet tool install --global Roslynator.DotNet.Cli --version 4.6.1
+dotnet tool install --global dotnet-format --version 7.0.453106
+
+# Анализ кода
+roslynator analyze . --severity warning
+
+# Проверка форматирования
+dotnet format --verify-no-changes
+```
+
+#### GitHub Actions
+
+Линтинг запускается автоматически при пуше в `main`/`master` и в PR. Workflow: `.github/workflows/code-quality.yml`
 
 ### Работа с зависимостями
 
 - Восстановление пакетов через `nuget.config`
 - Зависимости управляются через стандартные `.csproj` файлы
+- Глобальные анализаторы подключены через `Directory.Build.props`
 
 ---
 
@@ -202,12 +273,17 @@ docker-compose up -d
 ```
 /
 ├── .github/                    # GitHub конфигурация
+│   └── workflows/              # GitHub Actions workflows
+│       ├── docker.yml          # Сборка и публикация Docker образов
+│       └── code-quality.yml    # Проверка качества кода
 ├── .roo/                       # Правила для AI-ассистентов
 │   ├── rules-architect/        # Архитектурные ограничения
 │   ├── rules-ask/              # Контекст документации
 │   ├── rules-code/             # Правила кодирования
 │   └── rules-debug/            # Особенности отладки
 ├── .history/                   # История версий
+├── .editorconfig               # Правила форматирования кода
+├── Directory.Build.props       # Глобальные настройки сборки
 ├── Deploy/                     # Файлы развёртывания
 ├── DocumentXmlProcessorAPI/    # REST API
 │   ├── Controllers/            # API контроллеры
@@ -233,6 +309,7 @@ docker-compose up -d
 ├── clean-dotnet.cmd            # Очистка .NET проекта
 ├── Dockerfile-*                # Docker файлы для каждого сервиса
 ├── Jenkinsfile                 # Jenkins CI/CD пайплайн
+├── KODA.md                     # Инструкции для AI-ассистентов
 ├── nuget.config                # NuGet конфигурация
 ├── README.md                   # Документация проекта
 └── VERSION                     # Версия проекта
@@ -246,9 +323,7 @@ docker-compose up -d
 
 1. **Регистр в docker-compose.yml**: Файл ссылается на `DocumentXMLProcessorAPI/`, но директория называется `DocumentXmlProcessorAPI/` — может вызывать ошибки на Linux.
 
-2. **Прекомпиляция для Docker**: Перед сборкой Docker-образов необходимо скомпилировать проект, так как Dockerfiles копируют бинарники из `obj/Debug/`.
-
-3. **Ресурсы XsltProcessor**: Для работы XSLT-процессора требуются файлы схем (xsd) и шаблонов (xslt) в выходной директории.
+2. **Ресурсы XsltProcessor**: Для работы XSLT-процессора требуются файлы схем (xsd) и шаблонов (xslt) в выходной директории.
 
 ### Отладка
 

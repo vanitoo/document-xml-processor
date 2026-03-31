@@ -1,0 +1,137 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Получаем версию из файла VERSION
+  get-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.VERSION }}
+      is_tag: ${{ steps.version.outputs.IS_TAG }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(cat VERSION)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "IS_TAG=true" >> $GITHUB_OUTPUT
+          else
+            echo "IS_TAG=false" >> $GITHUB_OUTPUT
+          fi
+          echo "Version: $VERSION"
+
+  # Сборка всех сервисов
+  build:
+    needs: get-version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - file_watcher
+          - pdf_processor
+          - xslt_processor
+          - api_processor
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        if: needs.get-version.outputs.is_tag == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}},value=${{ needs.get-version.outputs.version }}
+            type=sha,prefix=
+            latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile-${{ matrix.service }}
+          push: ${{ needs.get-version.outputs.is_tag == 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILD_CONFIGURATION=Release
+
+  # Обновление образа latest после успешной сборки
+  update-latest:
+    needs: [get-version, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    if: needs.get-version.outputs.is_tag == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull and retag images as latest
+        run: |
+          for service in file_watcher pdf_processor xslt_processor api_processor; do
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:${{ needs.get-version.outputs.version }}
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:${{ needs.get-version.outputs.version }} \
+                       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:latest
+            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:latest
+          done
+
+  # Уведомление о завершении
+  notify:
+    needs: [get-version, build]
+    runs-on: ubuntu-latest
+    if: always() && needs.get-version.outputs.is_tag == 'true'
+    steps:
+      - name: Success notification
+        if: needs.build.result == 'success'
+        run: echo "✅ Docker images successfully built and pushed!"
+
+      - name: Failure notification
+        if: needs.build.result == 'failure'
+        run: echo "❌ Build failed! Check GitHub Actions logs."
