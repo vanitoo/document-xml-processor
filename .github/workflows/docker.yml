@@ -19,12 +19,11 @@ jobs:
   prepare:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.vars.outputs.version }}
       publish: ${{ steps.vars.outputs.publish }}
-      is_release: ${{ steps.vars.outputs.is_release }}
       image_repo: ${{ steps.vars.outputs.image_repo }}
-      ref_name_safe: ${{ steps.vars.outputs.ref_name_safe }}
+      version: ${{ steps.vars.outputs.version }}
       short_sha: ${{ steps.vars.outputs.short_sha }}
+      ref_name_safe: ${{ steps.vars.outputs.ref_name_safe }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -44,23 +43,16 @@ jobs:
           fi
 
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-            IS_RELEASE=true
             VERSION="${GITHUB_REF#refs/tags/v}"
           else
-            IS_RELEASE=false
-            if [[ -f VERSION ]]; then
-              VERSION=$(tr -d '[:space:]' < VERSION)
-            else
-              VERSION="0.0.0"
-            fi
+            VERSION="$(date -u +'%Y.%m.%d-%H%M%S')-${{ github.run_number }}-${SHORT_SHA}"
           fi
 
+          echo "publish=$PUBLISH" >> "$GITHUB_OUTPUT"
           echo "image_repo=$IMAGE_REPO" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
           echo "ref_name_safe=$REF_NAME_SAFE" >> "$GITHUB_OUTPUT"
-          echo "publish=$PUBLISH" >> "$GITHUB_OUTPUT"
-          echo "is_release=$IS_RELEASE" >> "$GITHUB_OUTPUT"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Debug info
         run: |
@@ -68,9 +60,8 @@ jobs:
           echo "github.ref=${{ github.ref }}"
           echo "github.ref_name=${{ github.ref_name }}"
           echo "publish=${{ steps.vars.outputs.publish }}"
-          echo "is_release=${{ steps.vars.outputs.is_release }}"
-          echo "version=${{ steps.vars.outputs.version }}"
           echo "image_repo=${{ steps.vars.outputs.image_repo }}"
+          echo "version=${{ steps.vars.outputs.version }}"
           echo "short_sha=${{ steps.vars.outputs.short_sha }}"
 
   build:
@@ -109,14 +100,9 @@ jobs:
         run: |
           IMAGE="${{ env.REGISTRY }}/${{ needs.prepare.outputs.image_repo }}/${{ matrix.service }}"
 
-          TAGS="${IMAGE}:sha-${{ needs.prepare.outputs.short_sha }}"
+          TAGS="${IMAGE}:${{ needs.prepare.outputs.version }}"
 
-          if [[ "${{ github.ref_type }}" == "branch" ]]; then
-            TAGS="${TAGS}"$'\n'"${IMAGE}:${{ needs.prepare.outputs.ref_name_safe }}"
-          fi
-
-          if [[ "${{ needs.prepare.outputs.is_release }}" == "true" ]]; then
-            TAGS="${TAGS}"$'\n'"${IMAGE}:${{ needs.prepare.outputs.version }}"
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
             TAGS="${TAGS}"$'\n'"${IMAGE}:latest"
           fi
 
@@ -155,16 +141,16 @@ jobs:
       - name: Print result
         run: |
           echo "publish=${{ needs.prepare.outputs.publish }}"
-          echo "is_release=${{ needs.prepare.outputs.is_release }}"
+          echo "version=${{ needs.prepare.outputs.version }}"
           echo "build_result=${{ needs.build.result }}"
 
       - name: Success notification
         if: needs.build.result == 'success'
         run: |
-          if [[ "${{ needs.prepare.outputs.is_release }}" == "true" ]]; then
-            echo "✅ Release images built and pushed successfully."
-          elif [[ "${{ needs.prepare.outputs.publish }}" == "true" ]]; then
-            echo "✅ Branch images built and pushed successfully."
+          if [[ "${{ needs.prepare.outputs.publish }}" == "true" ]]; then
+            echo "✅ Images built and pushed successfully."
+            echo "Version: ${{ needs.prepare.outputs.version }}"
+            echo "Tags: latest, ${{ needs.prepare.outputs.version }}"
           else
             echo "✅ Pull request build completed successfully (no push)."
           fi
@@ -172,5 +158,4 @@ jobs:
       - name: Failure notification
         if: needs.build.result == 'failure'
         run: echo "❌ Build failed. Check GitHub Actions logs."
-
         
