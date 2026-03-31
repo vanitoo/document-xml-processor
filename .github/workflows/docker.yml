@@ -27,17 +27,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Debug info
+        run: |
+          echo "Git ref: ${{ github.ref }}"
+          echo "Event: ${{ github.event_name }}"
+          echo "VERSION content:"
+          cat VERSION
+
       - name: Read version
         id: version
         run: |
           VERSION=$(cat VERSION)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             echo "IS_TAG=true" >> $GITHUB_OUTPUT
+            echo ">>> TAG DETECTED - will PUSH images to ghcr.io"
           else
             echo "IS_TAG=false" >> $GITHUB_OUTPUT
+            echo ">>> NO TAG - will NOT push images"
           fi
-          echo "Version: $VERSION"
 
   # Сборка всех сервисов
   build:
@@ -58,6 +67,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Debug
+        run: |
+          echo "Building: ${{ matrix.service }}"
+          echo "Is tag: ${{ needs.get-version.outputs.is_tag }}"
+          echo "Version: ${{ needs.get-version.outputs.version }}"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -69,30 +84,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}},value=${{ needs.get-version.outputs.version }}
-            type=sha,prefix=
-            latest
-
-      - name: Build and push Docker image
+      - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile-${{ matrix.service }}
-          push: ${{ needs.get-version.outputs.is_tag == 'true' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          push: false
+          load: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:${{ needs.get-version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
             BUILD_CONFIGURATION=Release
+
+      - name: Push to registry
+        if: needs.get-version.outputs.is_tag == 'true'
+        run: |
+          echo "Pushing ${{ matrix.service }}:${{ needs.get-version.outputs.version }}"
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:${{ needs.get-version.outputs.version }}
 
   # Обновление образа latest после успешной сборки
   update-latest:
@@ -115,9 +125,13 @@ jobs:
 
       - name: Pull and retag images as latest
         run: |
+          VERSION=${{ needs.get-version.outputs.version }}
+          echo "Updating latest for version $VERSION"
+          
           for service in file_watcher pdf_processor xslt_processor api_processor; do
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:${{ needs.get-version.outputs.version }}
-            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:${{ needs.get-version.outputs.version }} \
+            echo "Processing $service"
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:$VERSION
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:$VERSION \
                        ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:latest
             docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:latest
           done
@@ -126,10 +140,10 @@ jobs:
   notify:
     needs: [get-version, build]
     runs-on: ubuntu-latest
-    if: always() && needs.get-version.outputs.is_tag == 'true'
+    if: always()
     steps:
       - name: Success notification
-        if: needs.build.result == 'success'
+        if: needs.get-version.outputs.is_tag == 'true' && needs.build.result == 'success'
         run: echo "✅ Docker images successfully built and pushed!"
 
       - name: Failure notification
