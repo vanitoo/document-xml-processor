@@ -14,43 +14,67 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # Получаем версию из файла VERSION
-  get-version:
+  prepare:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.outputs.VERSION }}
-      is_tag: ${{ steps.version.outputs.IS_TAG }}
+      version: ${{ steps.vars.outputs.version }}
+      publish: ${{ steps.vars.outputs.publish }}
+      is_release: ${{ steps.vars.outputs.is_release }}
+      image_repo: ${{ steps.vars.outputs.image_repo }}
+      ref_name_safe: ${{ steps.vars.outputs.ref_name_safe }}
+      short_sha: ${{ steps.vars.outputs.short_sha }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Debug info
+      - name: Prepare variables
+        id: vars
+        shell: bash
         run: |
-          echo "Git ref: ${{ github.ref }}"
-          echo "Event: ${{ github.event_name }}"
-          echo "VERSION content:"
-          cat VERSION
+          IMAGE_REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          SHORT_SHA="${GITHUB_SHA::7}"
+          REF_NAME_SAFE=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')
 
-      - name: Read version
-        id: version
-        run: |
-          VERSION=$(cat VERSION)
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          
-          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-            echo "IS_TAG=true" >> $GITHUB_OUTPUT
-            echo ">>> TAG DETECTED - will PUSH images to ghcr.io"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            PUBLISH=false
           else
-            echo "IS_TAG=false" >> $GITHUB_OUTPUT
-            echo ">>> NO TAG - will NOT push images"
+            PUBLISH=true
           fi
 
-  # Сборка всех сервисов
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            IS_RELEASE=true
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          else
+            IS_RELEASE=false
+            if [[ -f VERSION ]]; then
+              VERSION=$(tr -d '[:space:]' < VERSION)
+            else
+              VERSION="0.0.0"
+            fi
+          fi
+
+          echo "image_repo=$IMAGE_REPO" >> "$GITHUB_OUTPUT"
+          echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
+          echo "ref_name_safe=$REF_NAME_SAFE" >> "$GITHUB_OUTPUT"
+          echo "publish=$PUBLISH" >> "$GITHUB_OUTPUT"
+          echo "is_release=$IS_RELEASE" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Debug info
+        run: |
+          echo "event_name=${{ github.event_name }}"
+          echo "github.ref=${{ github.ref }}"
+          echo "github.ref_name=${{ github.ref_name }}"
+          echo "publish=${{ steps.vars.outputs.publish }}"
+          echo "is_release=${{ steps.vars.outputs.is_release }}"
+          echo "version=${{ steps.vars.outputs.version }}"
+          echo "image_repo=${{ steps.vars.outputs.image_repo }}"
+          echo "short_sha=${{ steps.vars.outputs.short_sha }}"
+
   build:
-    needs: get-version
+    needs: prepare
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -63,89 +87,90 @@ jobs:
           - pdf_processor
           - xslt_processor
           - api_processor
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Debug
-        run: |
-          echo "Building: ${{ matrix.service }}"
-          echo "Is tag: ${{ needs.get-version.outputs.is_tag }}"
-          echo "Version: ${{ needs.get-version.outputs.version }}"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Container Registry
-        if: needs.get-version.outputs.is_tag == 'true'
+      - name: Log in to GHCR
+        if: needs.prepare.outputs.publish == 'true'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker image
+      - name: Prepare tags
+        id: tags
+        shell: bash
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ needs.prepare.outputs.image_repo }}/${{ matrix.service }}"
+
+          TAGS="${IMAGE}:sha-${{ needs.prepare.outputs.short_sha }}"
+
+          if [[ "${{ github.ref_type }}" == "branch" ]]; then
+            TAGS="${TAGS}"$'\n'"${IMAGE}:${{ needs.prepare.outputs.ref_name_safe }}"
+          fi
+
+          if [[ "${{ needs.prepare.outputs.is_release }}" == "true" ]]; then
+            TAGS="${TAGS}"$'\n'"${IMAGE}:${{ needs.prepare.outputs.version }}"
+            TAGS="${TAGS}"$'\n'"${IMAGE}:latest"
+          fi
+
+          {
+            echo "tags<<EOF"
+            echo "$TAGS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Final tags:"
+          echo "$TAGS"
+
+      - name: Build and optionally push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile-${{ matrix.service }}
-          push: false
-          load: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:${{ needs.get-version.outputs.version }}
+          push: ${{ needs.prepare.outputs.publish == 'true' }}
+          tags: ${{ steps.tags.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
             BUILD_CONFIGURATION=Release
+          labels: |
+            org.opencontainers.image.title=${{ matrix.service }}
+            org.opencontainers.image.description=${{ matrix.service }} service image
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ needs.prepare.outputs.version }}
 
-      - name: Push to registry
-        if: needs.get-version.outputs.is_tag == 'true'
-        run: |
-          echo "Pushing ${{ matrix.service }}:${{ needs.get-version.outputs.version }}"
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:${{ needs.get-version.outputs.version }}
-
-  # Обновление образа latest после успешной сборки
-  update-latest:
-    needs: [get-version, build]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    if: needs.get-version.outputs.is_tag == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Pull and retag images as latest
-        run: |
-          VERSION=${{ needs.get-version.outputs.version }}
-          echo "Updating latest for version $VERSION"
-          
-          for service in file_watcher pdf_processor xslt_processor api_processor; do
-            echo "Processing $service"
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:$VERSION
-            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:$VERSION \
-                       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:latest
-            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/$service:latest
-          done
-
-  # Уведомление о завершении
   notify:
-    needs: [get-version, build]
+    needs: [prepare, build]
     runs-on: ubuntu-latest
     if: always()
     steps:
+      - name: Print result
+        run: |
+          echo "publish=${{ needs.prepare.outputs.publish }}"
+          echo "is_release=${{ needs.prepare.outputs.is_release }}"
+          echo "build_result=${{ needs.build.result }}"
+
       - name: Success notification
-        if: needs.get-version.outputs.is_tag == 'true' && needs.build.result == 'success'
-        run: echo "✅ Docker images successfully built and pushed!"
+        if: needs.build.result == 'success'
+        run: |
+          if [[ "${{ needs.prepare.outputs.is_release }}" == "true" ]]; then
+            echo "✅ Release images built and pushed successfully."
+          elif [[ "${{ needs.prepare.outputs.publish }}" == "true" ]]; then
+            echo "✅ Branch images built and pushed successfully."
+          else
+            echo "✅ Pull request build completed successfully (no push)."
+          fi
 
       - name: Failure notification
         if: needs.build.result == 'failure'
-        run: echo "❌ Build failed! Check GitHub Actions logs."
+        run: echo "❌ Build failed. Check GitHub Actions logs."
+
+        
