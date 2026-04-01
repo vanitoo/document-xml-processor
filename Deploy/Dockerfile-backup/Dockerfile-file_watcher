@@ -1,18 +1,12 @@
-﻿# Optimized File Watcher Dockerfile
-# Base size: ~80MB (vs ~220MB original)
-
-# Specify .NET version via arguments
+﻿# Specify .NET version via arguments
 ARG DOTNET_VERSION=7.0
 ARG BUILD_CONFIGURATION=Release
 
 # ===== Build Stage =====
-FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
 ARG DOTNET_VERSION
 ARG BUILD_CONFIGURATION
 WORKDIR /source
-
-# Install build dependencies
-RUN apk add --no-cache curl
 
 # Copy .csproj files for caching
 COPY ./DocumentXmlProcessorContext/DocumentXmlProcessorContext.csproj ./DocumentXmlProcessorContext/
@@ -30,27 +24,17 @@ COPY ./OldFIleWatcher ./OldFIleWatcher/
 WORKDIR /source/OldFIleWatcher
 RUN dotnet publish -c $BUILD_CONFIGURATION -o /app --no-restore --configfile ../nuget.config
 
-# Remove unnecessary files
-RUN rm -rf /app/*.pdb /app/*.xml 2>/dev/null || true
-
 # ===== Runtime Stage =====
-FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION}-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS runtime
 WORKDIR /app
 
-# Install runtime dependencies
-RUN apk add --no-cache \
-    icu-libs \
-    libgdiplus \
-    ca-certificates \
-    tzdata
-
-# Copy built application
+# Копируем собранное приложение
 COPY --from=build /app ./
 
-# Copy configuration
+# Копируем конфигурацию (если есть)
 COPY ./OldFIleWatcher/appsettings.json ./
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s CMD wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1
+# Healthcheck — проверка, что контейнер жив
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s CMD curl --fail http://localhost:5000/health || exit 1
 
 ENTRYPOINT ["dotnet", "OldFIleWatcher.dll"]

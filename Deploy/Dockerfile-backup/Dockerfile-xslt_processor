@@ -1,12 +1,6 @@
-# Optimized XSLT Processor Dockerfile
-# Base size: ~100MB (vs ~656MB original)
-
-FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /source
-
-# Install build dependencies
-RUN apk add --no-cache curl
 
 # Copy only necessary .csproj files for caching
 COPY ./ProcessingCommon/ProcessingCommon.csproj ./ProcessingCommon/
@@ -22,24 +16,8 @@ COPY ./XsltProcessor ./XsltProcessor/
 WORKDIR /source/XsltProcessor
 RUN dotnet publish XsltProcessor.csproj -c $BUILD_CONFIGURATION -o /app --no-restore
 
-# Remove unnecessary files
-RUN rm -rf /app/*.pdb /app/*.xml 2>/dev/null || true
-
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app
-
-# Install runtime dependencies
-RUN apk add --no-cache \
-    icu-libs \
-    libgdiplus \
-    ca-certificates \
-    tzdata
-
 COPY --from=build /app ./
 COPY ./XsltProcessor/appsettings.json ./
-
-# Ensure xsd and xslt folders are copied
-COPY ./XsltProcessor/xsd/ ./xsd/
-COPY ./XsltProcessor/xslt/ ./xslt/
-
 ENTRYPOINT ["dotnet", "XsltProcessor.dll"]
