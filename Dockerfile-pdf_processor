@@ -38,13 +38,11 @@ RUN apk add --no-cache \
 COPY --from=build /app ./
 COPY ./PdfProcessor/appsettings.json ./
 
-# wkhtmltopdf + native libs from Alpine-compatible image
-COPY --from=wkhtmltopdf /bin/wkhtmltopdf /bin/wkhtmltopdf
-COPY --from=wkhtmltopdf /bin/wkhtmltoimage /bin/wkhtmltoimage
+COPY --from=wkhtmltopdf /bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
+COPY --from=wkhtmltopdf /bin/wkhtmltoimage /usr/local/bin/wkhtmltoimage
 COPY --from=wkhtmltopdf /lib/libwkhtmltox* /lib/
 
-# for libs that look in /usr/lib
-RUN ln -sf /lib/libwkhtmltox.so /usr/lib/libwkhtmltox.so || true
+RUN chmod +x /usr/local/bin/wkhtmltopdf /usr/local/bin/wkhtmltoimage && \
+    ln -sf /lib/libwkhtmltox.so /usr/lib/libwkhtmltox.so || true
 
 ENTRYPOINT ["dotnet", "PdfProcessor.dll"]
-
