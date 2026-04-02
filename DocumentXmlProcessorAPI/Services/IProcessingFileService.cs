@@ -249,24 +249,32 @@ public class ProcessingFileService : IProcessingFileService
             {
                 string directoryPath = Path.Combine(_environment.ContentRootPath, DataDirectory, "Html",
                     file.Id.ToString());
-                try
-                {
-                    foreach (string pathFile in Directory.EnumerateFiles(directoryPath, "*.*", SearchOption.AllDirectories))
-                    {
-                        if (File.Exists(pathFile))
-                        {
-                            File.Delete(pathFile);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Ошибка при удалении файла с данными {id}, {ex}", file.Id, ex);
-                }
-
+                
                 if (Directory.Exists(directoryPath))
                 {
-                    Directory.Delete(directoryPath);
+                    try
+                    {
+                        foreach (string pathFile in Directory.EnumerateFiles(directoryPath, "*.*", SearchOption.AllDirectories))
+                        {
+                            if (File.Exists(pathFile))
+                            {
+                                File.Delete(pathFile);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Ошибка при удалении файла с данными {id}, {ex}", file.Id, ex);
+                    }
+
+                    try
+                    {
+                        Directory.Delete(directoryPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Ошибка при удалении директории {id}, {ex}", file.Id, ex);
+                    }
                 }
             }
 
@@ -274,24 +282,32 @@ public class ProcessingFileService : IProcessingFileService
             {
                 string directoryPath = Path.Combine(_environment.ContentRootPath, DataDirectory, "Pdf",
                     file.Id.ToString());
-                try
-                {
-                    foreach (string pathFile in Directory.EnumerateFiles(directoryPath, "*.*", SearchOption.AllDirectories))
-                    {
-                        if (File.Exists(pathFile))
-                        {
-                            File.Delete(pathFile);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Ошибка при удалении файла с данными {id}, {ex}", file.Id, ex);
-                }
                 
                 if (Directory.Exists(directoryPath))
                 {
-                    Directory.Delete(directoryPath);
+                    try
+                    {
+                        foreach (string pathFile in Directory.EnumerateFiles(directoryPath, "*.*", SearchOption.AllDirectories))
+                        {
+                            if (File.Exists(pathFile))
+                            {
+                                File.Delete(pathFile);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Ошибка при удалении файла с данными {id}, {ex}", file.Id, ex);
+                    }
+
+                    try
+                    {
+                        Directory.Delete(directoryPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Ошибка при удалении директории {id}, {ex}", file.Id, ex);
+                    }
                 }
             }
         }

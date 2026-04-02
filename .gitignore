@@ -11,6 +11,8 @@ TestResults/
 *.sln.docstates
 *.log
 *.tmp
+test/
+
 
 #################################
 # Visual Studio

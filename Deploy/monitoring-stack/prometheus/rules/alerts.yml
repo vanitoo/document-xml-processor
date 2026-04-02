@@ -1,0 +1,28 @@
+groups:
+  - name: host-and-containers
+    rules:
+
+      - alert: HighCPUUsage
+        expr: 100 * (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m]))) > 85
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+
+      - alert: HighMemoryUsage
+        expr: 100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 85
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+
+      - alert: ContainerHighMemory
+        expr: sum by (container) (container_memory_working_set_bytes{container!=""}) 
+              / sum by (container) (container_spec_memory_limit_bytes{container!=""}) > 0.9
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container memory > 90%"
