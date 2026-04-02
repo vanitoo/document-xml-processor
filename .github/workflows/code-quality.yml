@@ -75,6 +75,5 @@ jobs:
 
       - name: Check code formatting
         run: |
-          dotnet tool install --global dotnet-format --version 7.0.453106
           export PATH="$PATH:$HOME/.dotnet/tools"
           dotnet format --verify-no-changes --verbosity diagnostic
