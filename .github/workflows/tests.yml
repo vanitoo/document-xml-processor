@@ -1,0 +1,153 @@
+name: Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - '**/*.cs'
+      - '**/*.csproj'
+      - '**/*.props'
+      - '**/*.config'
+      - '**/*.sln'
+  pull_request:
+    paths:
+      - '**/*.cs'
+      - '**/*.csproj'
+      - '**/*.props'
+      - '**/*.config'
+      - '**/*.sln'
+
+jobs:
+  test-processing-common:
+    runs-on: ubuntu-latest
+    name: ProcessingCommon.Tests
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore
+        run: dotnet restore ProcessingCommon.Tests/ProcessingCommon.Tests.csproj
+
+      - name: Build
+        run: dotnet build ProcessingCommon.Tests/ProcessingCommon.Tests.csproj --no-restore --verbosity minimal
+
+      - name: Test
+        run: dotnet test ProcessingCommon.Tests/ProcessingCommon.Tests.csproj --no-build --verbosity normal
+
+  test-xslt-processor:
+    runs-on: ubuntu-latest
+    name: XsltProcessor.Tests
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore
+        run: dotnet restore XsltProcessor.Tests/XsltProcessor.Tests.csproj
+
+      - name: Build
+        run: dotnet build XsltProcessor.Tests/XsltProcessor.Tests.csproj --no-restore --verbosity minimal
+
+      - name: Test
+        run: dotnet test XsltProcessor.Tests/XsltProcessor.Tests.csproj --no-build --verbosity normal
+
+  test-pdf-processor:
+    runs-on: ubuntu-latest
+    name: PdfProcessor.Tests
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore
+        run: dotnet restore PdfProcessor.Tests/PdfProcessor.Tests.csproj
+
+      - name: Build
+        run: dotnet build PdfProcessor.Tests/PdfProcessor.Tests.csproj --no-restore --verbosity minimal
+
+      - name: Test
+        run: dotnet test PdfProcessor.Tests/PdfProcessor.Tests.csproj --no-build --verbosity normal
+
+  test-old-file-watcher:
+    runs-on: ubuntu-latest
+    name: OldFIleWatcher.Tests
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore
+        run: dotnet restore OldFIleWatcher.Tests/OldFIleWatcher.Tests.csproj
+
+      - name: Build
+        run: dotnet build OldFIleWatcher.Tests/OldFIleWatcher.Tests.csproj --no-restore --verbosity minimal
+
+      - name: Test
+        run: dotnet test OldFIleWatcher.Tests/OldFIleWatcher.Tests.csproj --no-build --verbosity normal
+
+  test-context:
+    runs-on: ubuntu-latest
+    name: DocumentXmlProcessorContext.Tests
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore
+        run: dotnet restore DocumentXmlProcessorContext.Tests/DocumentXmlProcessorContext.Tests.csproj
+
+      - name: Build
+        run: dotnet build DocumentXmlProcessorContext.Tests/DocumentXmlProcessorContext.Tests.csproj --no-restore --verbosity minimal
+
+      - name: Test
+        run: dotnet test DocumentXmlProcessorContext.Tests/DocumentXmlProcessorContext.Tests.csproj --no-build --verbosity normal
+
+  test-api:
+    runs-on: ubuntu-latest
+    name: DocumentXmlProcessorAPI.Tests
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore
+        run: dotnet restore DocumentXmlProcessorAPI.Tests/DocumentXmlProcessorAPI.Tests.csproj
+
+      - name: Build
+        run: dotnet build DocumentXmlProcessorAPI.Tests/DocumentXmlProcessorAPI.Tests.csproj --no-restore --verbosity minimal
+
+      - name: Test
+        run: dotnet test DocumentXmlProcessorAPI.Tests/DocumentXmlProcessorAPI.Tests.csproj --no-build --verbosity normal

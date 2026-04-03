@@ -86,37 +86,5 @@ jobs:
       - name: Check code formatting
         run: dotnet format ./document-xml-processor.sln --verify-no-changes --verbosity diagnostic
 
-  tests:
-    runs-on: ubuntu-latest
-    env:
-      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '7.0.x'
-
-      - name: Create NuGet package directory
-        run: mkdir -p "$NUGET_PACKAGES"
-
-      - name: Restore dependencies
-        run: dotnet restore ./document-xml-processor.sln
-
-      - name: Build solution
-        run: dotnet build ./document-xml-processor.sln --no-restore --verbosity minimal
-
-      - name: Run unit tests
-        run: |
-          dotnet test ProcessingCommon.Tests/ProcessingCommon.Tests.csproj --no-build --verbosity normal
-          dotnet test XsltProcessor.Tests/XsltProcessor.Tests.csproj --no-build --verbosity normal
-          dotnet test PdfProcessor.Tests/PdfProcessor.Tests.csproj --no-build --verbosity normal
-          dotnet test OldFIleWatcher.Tests/OldFIleWatcher.Tests.csproj --no-build --verbosity normal
-          dotnet test DocumentXmlProcessorContext.Tests/DocumentXmlProcessorContext.Tests.csproj --no-build --verbosity normal
-          dotnet test DocumentXmlProcessorAPI.Tests/DocumentXmlProcessorAPI.Tests.csproj --no-build --verbosity normal
-
 
         
