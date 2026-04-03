@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -11,7 +12,7 @@ namespace OldFIleWatcher.Tests.Services;
 public class ServiceWorkerTests
 {
     private readonly Mock<ILogger<ServiceWorker>> _loggerMock;
-    private readonly Mock<IOptions<ApiSettings>> _settingsMock;
+    private readonly IOptions<ApiSettings> _settings;
     private readonly ApiSettings _apiSettings;
     private readonly Mock<IServiceScopeFactory> _scopeFactoryMock;
 
@@ -26,7 +27,7 @@ public class ServiceWorkerTests
             DeleteRequest = "/api/delete",
             CountDelete = 10
         };
-        _settingsMock = Mock.Of<IOptions<ApiSettings>>(x => x.Value == _apiSettings);
+        _settings = Options.Create(_apiSettings);
     }
 
     [Fact]
@@ -35,7 +36,7 @@ public class ServiceWorkerTests
         // Arrange & Act
         var worker = new ServiceWorker(
             _loggerMock.Object,
-            _settingsMock,
+            _settings,
             _scopeFactoryMock.Object
         );
 

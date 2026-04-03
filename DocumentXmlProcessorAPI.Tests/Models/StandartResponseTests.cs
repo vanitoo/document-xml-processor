@@ -10,7 +10,7 @@ public class StandartResponseTests
     public void StandartResponse_Ok_ShouldReturnSuccessStatus()
     {
         // Act
-        var response = StandartResponseAnswer.Ok("test data");
+        var response = StandartResponseAnswer.Ok();
 
         // Assert
         response.Status.Should().Be(200);
@@ -23,8 +23,8 @@ public class StandartResponseTests
         // Arrange
         var data = "test data";
 
-        // Act
-        var response = StandartResponseAnswer.Ok(data);
+        // Act - using generic version explicitly
+        var response = StandartResponseAnswer.Ok<string>(data);
 
         // Assert
         response.Data.Should().Be(data);
