@@ -20,7 +20,7 @@ on:
       - '**/*.yml'
 
 env:
-  DOTNET_VERSION: '7.0.404'
+  DOTNET_VERSION: '8.0.404'
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
 jobs:

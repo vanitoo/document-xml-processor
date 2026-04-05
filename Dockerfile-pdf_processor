@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /source
 
@@ -20,7 +20,7 @@ RUN dotnet publish -c $BUILD_CONFIGURATION -o /app --no-restore /p:UseAppHost=fa
 
 FROM ghcr.io/surnet/alpine-wkhtmltopdf:3.23.2-0.12.6-full AS wkhtmltopdf
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS runtime
 WORKDIR /app
 
 RUN apk add --no-cache \

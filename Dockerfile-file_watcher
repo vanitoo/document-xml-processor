@@ -2,7 +2,7 @@
 # Base size: ~80MB (vs ~220MB original)
 
 # Specify .NET version via arguments
-ARG DOTNET_VERSION=7.0
+ARG DOTNET_VERSION=8.0
 ARG BUILD_CONFIGURATION=Release
 
 # ===== Build Stage =====
