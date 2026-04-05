@@ -12,6 +12,9 @@ RUN apk add --no-cache curl
 COPY ./ProcessingCommon/ProcessingCommon.csproj ./ProcessingCommon/
 COPY ./XsltProcessor/XsltProcessor.csproj ./XsltProcessor/
 
+# Copy VERSION too, because csproj expects it at /source/VERSION
+COPY ./VERSION ./VERSION
+
 # Restore dependencies
 RUN dotnet restore XsltProcessor/XsltProcessor.csproj
 
