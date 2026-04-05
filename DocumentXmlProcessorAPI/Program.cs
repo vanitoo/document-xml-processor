@@ -8,6 +8,10 @@ using ProcessingCommon.Models.Settings;
 using ProcessingCommon.Services;
 
 LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+
+var version = File.Exists("./VERSION") ? File.ReadAllText("./VERSION").Trim() : "unknown";
+Console.WriteLine($"[STARTUP] DocumentXmlProcessorAPI v{version} starting...");
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders();

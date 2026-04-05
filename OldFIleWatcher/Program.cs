@@ -7,6 +7,9 @@ using OldFIleWatcher.Models;
 using OldFIleWatcher.Services;
 using ProcessingCommon.Services;
 
+var version = File.Exists("./VERSION") ? File.ReadAllText("./VERSION").Trim() : "unknown";
+Console.WriteLine($"[STARTUP] OldFIleWatcher v{version} starting...");
+
 IConfigurationRoot configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false)
