@@ -1,3 +1,5 @@
+[![Build and Push Docker Images](https://github.com/vanitoo/document-xml-processor/actions/workflows/docker.yml/badge.svg)](https://github.com/vanitoo/document-xml-processor/actions/workflows/docker.yml)
+
 # Document XML Processor
 
 Система обработки XML документов с использованием XSLT трансформаций, генерации PDF и API для управления процессом.
