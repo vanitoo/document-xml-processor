@@ -18,6 +18,7 @@ public class ServiceWorker : IServiceWorker
     {
         _logger.LogInformation("Начало работы сервиса! ({Time})", DateTime.Now);
         _brockerProcessor.StartRecived();
+        Thread.Sleep(TimeSpan.FromMinutes(60));
         _logger.LogInformation("Конец работы сервиса! ({Time})", DateTime.Now);
     }
 }
