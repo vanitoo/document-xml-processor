@@ -54,8 +54,6 @@ project.fragment.lock.json
 # Docker
 #################################
 
-**/Dockerfile.*
-docker-compose.*
 *.tar
 *.tgz
 .dockerignore
@@ -108,5 +106,3 @@ _ReSharper*/
 secrets.json
 appsettings.Development.json
 .env
-.env.*
-

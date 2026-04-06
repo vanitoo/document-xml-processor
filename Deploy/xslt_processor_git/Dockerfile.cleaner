@@ -1,0 +1,28 @@
+FROM alpine:latest
+
+# Schedule
+# Set default schedule values
+ARG MINUTE=*
+ARG HOUR=*
+ARG DAY_OF_MONTH=*
+ARG MONTH=*
+ARG DAY_OF_WEEK=*
+
+# The command to execute
+ARG COMMAND
+
+# Install necessary packages
+RUN apk add --no-cache bash
+
+# Configure cron
+RUN mkdir /etc/cron.d && \
+    echo "${MINUTE} ${HOUR} ${DAY_OF_MONTH} ${MONTH} ${DAY_OF_WEEK} ${COMMAND}" > /etc/cron.d/crontab && \
+    echo "# empty line" >> /etc/cron.d/crontab && \
+    crontab /etc/cron.d/crontab
+
+# Add clean script
+ADD clean.sh /usr/local/bin/clean.sh
+RUN chmod +x /usr/local/bin/clean.sh
+
+# Run cron
+CMD ["crond", "-f"]

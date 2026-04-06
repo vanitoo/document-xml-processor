@@ -1,0 +1,109 @@
+services:
+  file_watcher:
+    image: ghcr.io/vanitoo/document-xml-processor/file_watcher:latest
+    healthcheck:
+      disable: true
+    container_name: file_watcher
+    restart: always
+    networks:
+      - app-network
+    labels:
+      app: file_watcher
+      container_name: file_watcher
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
+
+  pdf_processor:
+    image: ghcr.io/vanitoo/document-xml-processor/pdf_processor:latest
+    container_name: pdf_processor
+    restart: always
+    networks:
+      - app-network
+    labels:
+      app: pdf_processor
+      container_name: pdf_processor
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
+
+  xslt_processor:
+    image: ghcr.io/vanitoo/document-xml-processor/xslt_processor:latest
+    container_name: xslt_processor
+    restart: always
+    networks:
+      - app-network
+    labels:
+      app: xslt_processor
+      container_name: xslt_processor
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
+
+  api_processor:
+    image: ghcr.io/vanitoo/document-xml-processor/api_processor:latest
+    container_name: api_processor
+    restart: always
+    ports:
+      - "5000:80"
+    volumes:
+      - ./Data:/app/Data
+    networks:
+      - app-network
+    labels:
+      app: api_processor
+      container_name: api_processor
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
+
+  cleaner:
+    build:
+      context: .
+      dockerfile: Dockerfile.cleaner
+      args:
+        MINUTE: "10"
+        HOUR: "*"
+        DAY_OF_MONTH: "*"
+        MONTH: "*"
+        DAY_OF_WEEK: "*"
+        COMMAND: "/usr/local/bin/clean.sh"
+    container_name: data-cleaner
+    restart: always
+    volumes:
+      - ./Data:/app/Data
+    networks:
+      - app-network
+    labels:
+      app: data-cleaner
+      container_name: data-cleaner
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
+
+networks:
+  app-network:
+    driver: bridge
+
+
+
