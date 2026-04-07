@@ -57,7 +57,7 @@ services:
     container_name: api_processor
     restart: always
     ports:
-      - "5000:80"
+      - "5000:8080"
     volumes:
       - ./Data:/app/Data
     networks:
