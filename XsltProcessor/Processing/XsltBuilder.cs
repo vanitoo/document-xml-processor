@@ -84,7 +84,7 @@ public class XsltBuilder
                         result = AddExtField3("Таможенный орган отправления", data.StatusName, result, ref lastReplacementPosition);
                         result = AddExtField3("Таможенный орган отправления",data.CustomsOffical, result, ref lastReplacementPosition);
 
-                        result = DeleteElements("Таможенный орган назначения", result, ref lastReplacementPosition);
+                        result = DeleteGraph("Таможенный орган назначения", result, ref lastReplacementPosition);
                         result = AddElement("Таможенный орган назначения", data.DestinationCustom, result, ref lastReplacementPosition);
                         result = AddElement("Таможенный орган назначения", data.DestinationPlaceCertificate, result, ref lastReplacementPosition);
                         result = AddElement("Таможенный орган назначения", data.DestinationStation, result, ref lastReplacementPosition);
@@ -245,7 +245,13 @@ public class XsltBuilder
         else
             return result;
     }
-
+    private static string DeleteGraph(string refValue, string result, ref int lastReplacementPosition)
+    {
+        int _base = result.IndexOf(refValue, lastReplacementPosition);
+        int start = result.IndexOf("<br>", _base) + 4;
+        int end = result.IndexOf("</td>", _base);
+        return result.Substring(0, start) + "" + result.Substring(end);
+    }
     private static string DeleteElements(string refValue, string result, ref int lastReplacementPosition)
     {
         int _base = result.IndexOf(refValue, lastReplacementPosition);
